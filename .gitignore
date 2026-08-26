@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.env
+*.db
+.pytest_cache/
+node_modules/
+.next/
+*.egg-info/
+PITCH_SCRIPT.md
+.freebuff
