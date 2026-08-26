@@ -1,0 +1,52 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    @apply bg-canvas text-navy font-sans antialiased;
+    background-image: radial-gradient(
+      1100px circle at 50% -12%,
+      rgba(51, 149, 255, 0.09) 0%,
+      rgba(51, 149, 255, 0) 55%
+    );
+    background-repeat: no-repeat;
+  }
+
+  ::selection {
+    background: rgba(51, 149, 255, 0.22);
+    color: #0c2451;
+  }
+
+  :focus-visible {
+    outline: 2px solid theme("colors.brand");
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  * {
+    scrollbar-color: theme("colors.borderStrong") transparent;
+    scrollbar-width: thin;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
