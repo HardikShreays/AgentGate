@@ -1,34 +1,14 @@
 services:
-  db:
-    image: postgres:16
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: agentgate
-      POSTGRES_PASSWORD: agentgate
-      POSTGRES_DB: agentgate
-    ports:
-      - "5432:5432"
-    volumes:
-      - agentgate_pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U agentgate -d agentgate"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
   api:
     build:
       context: ./backend
     restart: unless-stopped
+    # DATABASE_URL and other secrets come from the host .env file (Supabase).
+    # Do not override DATABASE_URL here with a local container hostname.
     env_file:
       - .env
-    environment:
-      DATABASE_URL: postgresql://agentgate:agentgate@db:5432/agentgate
     ports:
       - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy
 
   web:
     build:
@@ -44,5 +24,3 @@ services:
     depends_on:
       - api
 
-volumes:
-  agentgate_pgdata:
