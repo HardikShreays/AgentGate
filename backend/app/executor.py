@@ -54,7 +54,7 @@ def get_transaction_status(db: Session, transaction_id: str) -> TransactionStatu
         max_attempts=settings.FAILURE_MAX_ATTEMPTS,
         razorpay_order_id=txn.razorpay_order_id,
         razorpay_payment_id=txn.razorpay_payment_id,
-        attempts=[],
+        attempts=txn.attempts or [],
     )
 
 
@@ -107,6 +107,20 @@ class TransactionExecutor:
 
         # (4) re-check under lock — closes the exhaustion race window
         result, contract = check_consent(self.db, consent_id, amount, sku_category)
+
+        if result.allowed:
+            # Reserve now, in the SAME transaction as the check above —
+            # audit.log_action() commits by default, and that commit is
+            # what releases the FOR UPDATE lock (see _log_check below).
+            # If the reservation didn't land before that commit, a second
+            # request could acquire the lock right after and still see an
+            # un-held balance. spend_used only advances on webhook
+            # confirmation, so without this hold, two concurrent requests
+            # would both pass this check — the lock alone doesn't stop
+            # that, only a written hold does.
+            locked_contract.spend_reserved = Decimal(locked_contract.spend_reserved or 0) + amount
+            self.db.add(locked_contract)
+
         self._log_check(consent_id, amount, sku_category, contract, result, under_lock=True)
         if not result.allowed:
             reason = result.reason
@@ -127,6 +141,10 @@ class TransactionExecutor:
             result, contract = check_consent(self.db, consent_id, amount, sku_category)
             self._log_check(consent_id, amount, sku_category, contract, result, under_lock=True)
             if not result.allowed:
+                # Abandoning before an order is created — release the hold
+                # placed above so a revoked/aborted transaction doesn't
+                # permanently lock up budget it never actually spent.
+                self._release_reservation(consent_id, amount)
                 return self._denied_response(result)
 
         # (7) create the real Razorpay order
@@ -142,6 +160,15 @@ class TransactionExecutor:
             attempt_number=1,
             max_attempts=settings.FAILURE_MAX_ATTEMPTS,
             attempt_count=1,
+            attempts=[
+                {
+                    "attempt": 1,
+                    "razorpay_order_id": order["id"],
+                    "status": "pending",
+                    "error_reason": None,
+                    "created_at": _isoformat_now(),
+                }
+            ],
             updated_at=_now(),
         )
         self.db.add(txn)
@@ -175,6 +202,16 @@ class TransactionExecutor:
                 "Awaiting checkout completion and webhook confirmation."
             ),
         )
+
+    def _release_reservation(self, consent_id: str, amount: Decimal) -> None:
+        """Undo the hold placed under lock in execute() when a later check
+        aborts before an order is created (currently: the Phase 5
+        post-delay revocation re-check)."""
+        contract = self.db.get(ConsentContract, consent_id)
+        if contract is not None:
+            contract.spend_reserved = max(Decimal("0"), Decimal(contract.spend_reserved or 0) - amount)
+            self.db.add(contract)
+            self.db.commit()
 
     def _log_check(self, consent_id, amount, sku_category, contract, result, under_lock=False):
         payload = {

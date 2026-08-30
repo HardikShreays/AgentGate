@@ -36,7 +36,7 @@ from sqlalchemy.orm import Session
 
 from app.audit import log_action
 from app.config import get_settings
-from app.models import ActionType, Transaction, TransactionStatus
+from app.models import ActionType, ConsentContract, Transaction, TransactionStatus
 from app.razorpay_client import create_order, get_client
 
 settings = get_settings()
@@ -122,6 +122,15 @@ class FailureHandler:
     def _finalize_failed(self, txn: Transaction, current_attempt: int, error_reason: str) -> dict:
         txn.status = TransactionStatus.failed
         self.db.add(txn)
+
+        # Hard stop: this amount will never be captured, so release the
+        # hold placed under lock in executor.execute() rather than leaving
+        # it permanently reserved against the consent's balance.
+        contract = self.db.get(ConsentContract, txn.consent_id)
+        if contract is not None:
+            contract.spend_reserved = max(Decimal("0"), Decimal(contract.spend_reserved or 0) - Decimal(txn.amount))
+            self.db.add(contract)
+
         self.db.commit()
         self.db.refresh(txn)
 
@@ -170,7 +179,7 @@ class FailureHandler:
         # change-detection (which diffs old vs. new by value) would see
         # no difference and silently skip the UPDATE on commit.
         new_attempts = []
-        for entry in txn.attempt_count or []:
+        for entry in txn.attempts or []:
             entry = dict(entry)
             if entry.get("attempt") == attempt:
                 entry["status"] = status

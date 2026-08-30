@@ -156,7 +156,11 @@ def check_consent(
     if amount > contract.per_txn_max:
         return ConsentCheckResult(allowed=False, reason="per_txn_max_exceeded"), contract
 
-    remaining = Decimal(contract.spend_limit) - Decimal(contract.spend_used)
+    remaining = (
+        Decimal(contract.spend_limit)
+        - Decimal(contract.spend_used)
+        - Decimal(contract.spend_reserved or 0)
+    )
     if amount > remaining:
         return ConsentCheckResult(allowed=False, reason="insufficient_remaining_balance", remaining=remaining), contract
 

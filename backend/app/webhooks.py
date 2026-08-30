@@ -76,14 +76,19 @@ def _handle_captured(db: Session, txn: Transaction, payment_id: str):
     # here would silently fail to persist (SQLAlchemy's old/new diff would
     # see identical objects and skip the UPDATE).
     new_attempts = []
-    for entry in txn.aattempt_countttempts or []:
+    for entry in txn.attempts or []:
         entry = dict(entry)
         if entry.get("attempt") == txn.attempt_count:
             entry["status"] = "captured"
             entry["razorpay_payment_id"] = payment_id
         new_attempts.append(entry)
-    txn.attempt_count = new_attempts
+    txn.attempts = new_attempts
     contract.spend_used = Decimal(contract.spend_used) + Decimal(txn.amount)
+    # Settle the hold placed under lock in executor.execute(): the amount
+    # is no longer "in flight, unconfirmed" — it's confirmed, so it moves
+    # out of spend_reserved and into spend_used rather than being double-
+    # counted against remaining balance.
+    contract.spend_reserved = max(Decimal("0"), Decimal(contract.spend_reserved or 0) - Decimal(txn.amount))
     db.add(txn)
     db.add(contract)
     db.commit()
