@@ -8,3 +8,4 @@ node_modules/
 *.egg-info/
 PITCH_SCRIPT.md
 .freebuff 
+*.zip

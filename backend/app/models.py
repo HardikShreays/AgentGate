@@ -77,6 +77,13 @@ class ConsentContract(Base):
     merchant_id = Column(String, nullable=False)
     spend_limit = Column(Numeric(12, 2), nullable=False)
     spend_used = Column(Numeric(12, 2), nullable=False, default=0)
+    # Held under the row lock at execute()-time, before Razorpay/webhook
+    # confirmation. spend_used only advances on a confirmed webhook, so
+    # without this, two concurrent executes both see the same spend_used
+    # and both pass the balance check — this is what the row lock alone
+    # does NOT catch. Settled on webhook capture (moved into spend_used)
+    # or released on a hard-stop failure / aborted transaction.
+    spend_reserved = Column(Numeric(12, 2), nullable=False, default=0)
     per_txn_max = Column(Numeric(12, 2), nullable=False)
     scope = Column(JSON, nullable=False)  # list[str]
     expiry = Column(DateTime(timezone=True), nullable=False)
@@ -107,6 +114,13 @@ class Transaction(Base):
     attempt_number = Column(SAInteger, nullable=False, default=1)
     max_attempts = Column(SAInteger, nullable=False, default=2)
     attempt_count = Column(SAInteger, nullable=False, default=1)
+    # Per-attempt timeline (order id, outcome, error reason, timestamps).
+    # Written by executor.py (attempt 1) and failure.py (retries); read
+    # verbatim by GET /transaction/{id}/status. Was referenced throughout
+    # failure.py/webhooks.py but never declared here — attempt_count (an
+    # int) was being used in its place, which crashes on the first real
+    # payment failure or capture.
+    attempts = Column(JSON, nullable=False, default=list)
     deny_reason = Column(String, nullable=True)
     error_message = Column(String, nullable=True)
     reasoning = Column(String, nullable=True)
