@@ -30,6 +30,10 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str = ""
     GROQ_MODEL: str = "openai/gpt-oss-20b"
 
+    # Comma-separated list of allowed frontend origins, e.g.
+    # "http://localhost:3000,https://app.agentgate.example"
+    CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
+
 
 @lru_cache
 def get_settings() -> Settings:
