@@ -1,8 +1,12 @@
 import {
   ApiError,
   AuditTrailResponse,
+  ConsentCreateRequest,
   ConsentResponse,
   ConsentRevokeResponse,
+  ExecuteTransactionRequest,
+  ExecuteTransactionResponse,
+  TransactionStatusResponse,
 } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -36,6 +40,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+export function createConsent(body: ConsentCreateRequest): Promise<ConsentResponse> {
+  return request(`/consent`, { method: "POST", body: JSON.stringify(body) });
+}
+
 export function getConsent(consentId: string): Promise<ConsentResponse> {
   return request(`/consent/${encodeURIComponent(consentId)}`);
 }
@@ -48,6 +56,16 @@ export function revokeConsent(consentId: string): Promise<ConsentRevokeResponse>
 
 export function getAuditTrail(consentId: string): Promise<AuditTrailResponse> {
   return request(`/audit/${encodeURIComponent(consentId)}`);
+}
+
+export function executeTransaction(
+  body: ExecuteTransactionRequest
+): Promise<ExecuteTransactionResponse> {
+  return request(`/transaction/execute`, { method: "POST", body: JSON.stringify(body) });
+}
+
+export function getTransactionStatus(transactionId: string): Promise<TransactionStatusResponse> {
+  return request(`/transaction/${encodeURIComponent(transactionId)}/status`);
 }
 
 export { API_URL };

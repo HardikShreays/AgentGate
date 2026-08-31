@@ -4,6 +4,15 @@
 
 export type ConsentStatus = "active" | "expired" | "revoked" | "exhausted";
 
+export interface ConsentCreateRequest {
+  user_id: string;
+  merchant_id: string;
+  spend_limit: string;
+  per_txn_max: string;
+  scope: string[];
+  expiry_days: number;
+}
+
 export interface ConsentResponse {
   consent_id: string;
   user_id: string;
@@ -50,6 +59,31 @@ export interface AuditTrailResponse {
   consent_id: string;
   entry_count: number;
   entries: AuditLogEntry[];
+}
+
+export interface ExecuteTransactionRequest {
+  consent_id: string;
+  amount: string;
+  sku_category: string;
+  idempotency_key: string;
+  simulate_delay_ms?: number;
+}
+
+// Mirrors backend ExecuteTransactionResponse (app/schemas.py). Note this
+// is the *synchronous* response to POST /transaction/execute — status is
+// "pending" (a real Razorpay order was created, awaiting checkout +
+// webhook) or "denied" (rejected before any order was created). It is
+// never "captured" here — capture only ever shows up later, via
+// GET /transaction/{id}/status, once the webhook lands.
+export interface ExecuteTransactionResponse {
+  transaction_id: string | null;
+  status: string;
+  razorpay_order_id?: string | null;
+  razorpay_payment_id?: string | null;
+  amount?: string | null;
+  reason?: string | null;
+  reasoning: string;
+  consent_remaining?: string | null;
 }
 
 export interface TransactionAttempt {

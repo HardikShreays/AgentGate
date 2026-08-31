@@ -50,3 +50,22 @@
     font-variant-numeric: tabular-nums;
   }
 }
+
+/* Used by Timeline's `stagger` prop (live demo pages only) — rows fade
+   and settle in ~120ms apart so an audience can follow the sequence as
+   it happens instead of a JSON blob appearing all at once. Respects
+   prefers-reduced-motion via the global rule above. */
+@keyframes timeline-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-timeline-in {
+  animation: timeline-in 320ms ease-out forwards;
+}

@@ -105,6 +105,20 @@ export function Sidebar() {
           label="Transaction Timeline"
           active={pathname?.startsWith("/transactions/") ?? false}
         />
+
+        <div className="mb-1.5 mt-5 px-3 text-[10px] font-medium uppercase tracking-label text-faint">
+          Live demos
+        </div>
+        <NavLink
+          href="/demo/revocation"
+          label="Revocation (3:30)"
+          active={pathname?.startsWith("/demo/revocation") ?? false}
+        />
+        <NavLink
+          href="/demo/race"
+          label="Race condition"
+          active={pathname?.startsWith("/demo/race") ?? false}
+        />
       </nav>
 
       <div className="border-t border-border px-5 py-4 text-[11px] leading-relaxed text-faint">
