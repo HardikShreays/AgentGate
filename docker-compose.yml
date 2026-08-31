@@ -18,9 +18,11 @@ services:
         # an address the browser can reach — the host-exposed api port,
         # not the internal `api` service hostname.
         NEXT_PUBLIC_API_URL: http://localhost:8000
+        # Public key ID only; required at build time because Next.js
+        # inlines NEXT_PUBLIC_* values into the client bundle.
+        NEXT_PUBLIC_RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID}
     restart: unless-stopped
     ports:
       - "3000:3000"
     depends_on:
       - api
-

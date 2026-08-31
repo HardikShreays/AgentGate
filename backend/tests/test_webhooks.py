@@ -26,6 +26,14 @@ def _sign(body: str) -> str:
     ).hexdigest()
 
 
+def _payment_signature(order_id: str, payment_id: str) -> str:
+    return hmac.new(
+        key=settings.RAZORPAY_KEY_SECRET.encode("utf-8"),
+        msg=f"{order_id}|{payment_id}".encode("utf-8"),
+        digestmod=hashlib.sha256,
+    ).hexdigest()
+
+
 def _make_order_via_executor(db, consent_contract, mock_razorpay, idempotency_key="wh-key"):
     executor = TransactionExecutor(db)
     resp = executor.execute(
@@ -97,6 +105,56 @@ def test_webhook_captures_payment_with_valid_signature_and_updates_spend_used(db
 
         trail = audit_svc.get_audit_trail(db, consent_contract.consent_id)
         assert any(e.action_type == ActionType.payment_captured for e in trail.entries)
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_checkout_confirm_verifies_signature_and_captures_payment(db, consent_contract, mock_razorpay):
+    resp = _make_order_via_executor(db, consent_contract, mock_razorpay, idempotency_key="checkout-key")
+    _override_db(db)
+    try:
+        with TestClient(app, raise_server_exceptions=True) as client:
+            payment_id = "pay_CHECKOUT0001"
+            r = client.post(
+                "/transaction/confirm",
+                json={
+                    "transaction_id": resp.transaction_id,
+                    "razorpay_order_id": resp.razorpay_order_id,
+                    "razorpay_payment_id": payment_id,
+                    "razorpay_signature": _payment_signature(resp.razorpay_order_id, payment_id),
+                },
+            )
+            assert r.status_code == 200
+            assert r.json()["status"] == "captured"
+            assert r.json()["razorpay_payment_id"] == payment_id
+
+        txn = db.query(Transaction).filter(Transaction.transaction_id == resp.transaction_id).first()
+        assert txn.status == TransactionStatus.captured
+
+        contract = db.get(ConsentContract, consent_contract.consent_id)
+        assert contract.spend_used == Decimal("450.00")
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_checkout_confirm_rejects_bad_signature(db, consent_contract, mock_razorpay):
+    resp = _make_order_via_executor(db, consent_contract, mock_razorpay, idempotency_key="checkout-bad-sig")
+    _override_db(db)
+    try:
+        with TestClient(app, raise_server_exceptions=True) as client:
+            r = client.post(
+                "/transaction/confirm",
+                json={
+                    "transaction_id": resp.transaction_id,
+                    "razorpay_order_id": resp.razorpay_order_id,
+                    "razorpay_payment_id": "pay_BADSIG0001",
+                    "razorpay_signature": "not-the-real-signature",
+                },
+            )
+            assert r.status_code == 400
+
+        txn = db.query(Transaction).filter(Transaction.transaction_id == resp.transaction_id).first()
+        assert txn.status == TransactionStatus.pending
     finally:
         app.dependency_overrides.clear()
 

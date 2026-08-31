@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 
+import razorpay
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -11,8 +12,12 @@ from app.config import get_settings
 from app.executor import TransactionExecutor
 from app.executor import get_transaction_status as get_transaction_status_svc
 from app.models import ActionType
+from app.models import Transaction
+from app.razorpay_client import get_client, verify_payment_signature
 from app.webhooks import router as webhooks_router
+from app.webhooks import _handle_captured
 from app.schemas import (
+    ConfirmPaymentRequest,
     ConsentCreateRequest,
     ConsentResponse,
     ConsentRevokeResponse,
@@ -104,6 +109,39 @@ def execute_transaction(req: ExecuteTransactionRequest, db: Session = Depends(ge
         idempotency_key=req.idempotency_key,
         simulate_delay_ms=req.simulate_delay_ms,
     )
+
+
+@app.post("/transaction/confirm", response_model=TransactionStatusResponse)
+def confirm_payment(req: ConfirmPaymentRequest, db: Session = Depends(get_db)):
+    """Verified Checkout.js fallback for local/dev runs.
+
+    Razorpay webhooks remain the preferred asynchronous source of truth.
+    This endpoint covers environments where Razorpay cannot reach the
+    local backend (for example, no ngrok tunnel). It only settles a row
+    after verifying Razorpay's checkout signature server-side.
+    """
+    client = get_client()
+    try:
+        verify_payment_signature(
+            client,
+            req.razorpay_order_id,
+            req.razorpay_payment_id,
+            req.razorpay_signature,
+        )
+    except razorpay.errors.SignatureVerificationError:
+        raise HTTPException(status_code=400, detail="invalid payment signature")
+
+    txn = db.get(Transaction, req.transaction_id)
+    if txn is None:
+        raise HTTPException(status_code=404, detail="transaction not found")
+    if txn.razorpay_order_id != req.razorpay_order_id:
+        raise HTTPException(status_code=409, detail="payment order does not match transaction")
+
+    _handle_captured(db, txn, req.razorpay_payment_id)
+    status = get_transaction_status_svc(db, req.transaction_id)
+    if status is None:
+        raise HTTPException(status_code=404, detail="transaction not found")
+    return status
 
 
 @app.get("/audit/{consent_id}", response_model=AuditTrailResponse)

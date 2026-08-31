@@ -4,6 +4,7 @@ import {
   ConsentCreateRequest,
   ConsentResponse,
   ConsentRevokeResponse,
+  ConfirmPaymentRequest,
   ExecuteTransactionRequest,
   ExecuteTransactionResponse,
   TransactionStatusResponse,
@@ -62,6 +63,10 @@ export function executeTransaction(
   body: ExecuteTransactionRequest
 ): Promise<ExecuteTransactionResponse> {
   return request(`/transaction/execute`, { method: "POST", body: JSON.stringify(body) });
+}
+
+export function confirmPayment(body: ConfirmPaymentRequest): Promise<TransactionStatusResponse> {
+  return request(`/transaction/confirm`, { method: "POST", body: JSON.stringify(body) });
 }
 
 export function getTransactionStatus(transactionId: string): Promise<TransactionStatusResponse> {

@@ -292,9 +292,18 @@ npm install
 npm run dev
 ```
 
-You'll need a way for Razorpay's servers to reach `/webhooks/razorpay`
-(e.g. `ngrok` during local dev) and to register that URL plus a webhook
-secret in the Razorpay dashboard so real signatures verify.
+You'll need `NEXT_PUBLIC_RAZORPAY_KEY_ID` in `frontend/.env.local` for
+local Next.js dev. If you run through Docker Compose, the web image gets
+that public key from the root `.env` at build time.
+
+For pure webhook testing, Razorpay's servers must be able to reach
+`/webhooks/razorpay` (e.g. `ngrok` during local dev), and that URL plus
+the webhook secret must be registered in the Razorpay dashboard. The
+dashboard also has a verified `/transaction/confirm` fallback: after
+Checkout.js returns success, the browser sends Razorpay's signed
+`order_id/payment_id/signature` tuple to the API, and the API verifies it
+server-side before marking the transaction captured. This keeps local dev
+usable when no public webhook tunnel is configured.
 
 ---
 
