@@ -1,12 +1,8 @@
-import { AuditLogEntry, ActionType } from "@/lib/types";
+import { ActionType, AuditLogEntry } from "@/lib/types";
 import { formatDateTime, formatTime } from "@/lib/format";
-import { colorForEntry, COLOR_CLASSES, ACTION_LABELS, TimelineColor } from "@/lib/auditColor";
+import { ACTION_LABELS, COLOR_CLASSES, TimelineColor, colorForEntry } from "@/lib/auditColor";
 import { JsonPanel } from "./JsonPanel";
 
-// Extracted out of app/transactions/[id]/page.tsx (Phase 6) so the live
-// demo pages (app/demo/revocation, app/demo/race) can render the exact
-// same audit-trail visual instead of reimplementing it — per the demo
-// plan's note that these should import Timeline/TimelineRow directly.
 export const DEFAULT_LEGEND: { color: TimelineColor; label: string }[] = [
   { color: "success", label: "Success" },
   { color: "retry", label: "Retry" },
@@ -24,13 +20,7 @@ export function Timeline({
   entries: AuditLogEntry[];
   legend?: { color: TimelineColor; label: string }[];
   showLegend?: boolean;
-  // Fades rows in ~120ms apart, purely for visual drama on the live demo
-  // pages — the sequence itself is real, this just makes it legible to
-  // an audience watching a screen rather than reading a JSON blob.
   stagger?: boolean;
-  // Draws attention to one action_type (e.g. race_condition_detected) so
-  // the audience sees the server-side proof, not just the two HTTP
-  // responses that produced it.
   highlightActionType?: ActionType;
 }) {
   return (

@@ -1,9 +1,6 @@
 import { ConsentResponse } from "./types";
 import { formatInr, relativeExpiry } from "./format";
 
-// Deterministic, template-generated — same input always produces the same
-// sentence, matching the philosophy of the backend's own reasoning
-// templates (app/audit.py): readable prose that's still testable.
 export function summarizeConsent(c: ConsentResponse): string {
   const limit = formatInr(c.spend_limit);
   const used = formatInr(c.spend_used);
@@ -23,7 +20,7 @@ export function summarizeConsent(c: ConsentResponse): string {
 
   const integrityClause = c.integrity_valid
     ? "integrity verified"
-    : "integrity check FAILED — do not trust this record";
+    : "integrity check FAILED; do not trust this record";
 
   return (
     `${c.user_id} may spend up to ${limit} at ${c.merchant_id} on ${scope}, ` +

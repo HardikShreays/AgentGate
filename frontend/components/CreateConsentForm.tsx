@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { createConsent } from "@/lib/api";
 import { ApiError, ConsentResponse } from "@/lib/types";
 import { rememberConsentId } from "@/lib/recent";
+import { CopyButton } from "@/components/CopyButton";
 
 // P0-1 — replaces `curl -X POST /consent`. Pre-filled with the exact
 // values from README §9's "Happy path" so a presenter can hit Create
@@ -18,6 +19,19 @@ const DEFAULTS = {
   expiry_days: "7",
 };
 
+// P2-2 — scenario presets. Same field shape as DEFAULTS, so switching
+// presets is just a setValues() swap; no separate form state needed.
+// Values match what /demo/revocation and /demo/race already create
+// under the hood, so a preset here and a "Run live demo" click produce
+// contracts with identical limits — no surprise numbers on stage.
+const PRESETS: { label: string; values: typeof DEFAULTS }[] = [
+  { label: "Groceries ₹2000 / ₹500", values: DEFAULTS },
+  {
+    label: "Race setup ₹500 / ₹500",
+    values: { ...DEFAULTS, spend_limit: "500", per_txn_max: "500" },
+  },
+];
+
 export function CreateConsentForm({
   onCreated,
   compact,
@@ -26,12 +40,19 @@ export function CreateConsentForm({
   compact?: boolean;
 }) {
   const [values, setValues] = useState(DEFAULTS);
+  const [activePreset, setActivePreset] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<ConsentResponse | null>(null);
 
   function set<K extends keyof typeof DEFAULTS>(key: K, value: string) {
     setValues((v) => ({ ...v, [key]: value }));
+    setActivePreset(-1); // hand-editing a field detaches from any preset
+  }
+
+  function applyPreset(index: number) {
+    setValues(PRESETS[index].values);
+    setActivePreset(index);
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -63,6 +84,7 @@ export function CreateConsentForm({
   function reset() {
     setCreated(null);
     setError(null);
+    setValues(PRESETS[activePreset]?.values ?? DEFAULTS);
   }
 
   if (created) {
@@ -71,8 +93,11 @@ export function CreateConsentForm({
         <div className="text-[11px] font-medium uppercase tracking-label text-success">
           Consent created
         </div>
-        <div className="mt-1.5 truncate font-mono text-sm text-navy" title={created.consent_id}>
-          {created.consent_id}
+        <div className="mt-1.5 flex items-center gap-1 font-mono text-sm text-navy">
+          <span className="truncate" title={created.consent_id}>
+            {created.consent_id}
+          </span>
+          <CopyButton value={created.consent_id} label="Consent ID" />
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
           <a
@@ -112,6 +137,23 @@ export function CreateConsentForm({
           </p>
         </div>
       )}
+
+      <div className="mb-4 flex flex-wrap gap-1.5">
+        {PRESETS.map((preset, i) => (
+          <button
+            key={preset.label}
+            type="button"
+            onClick={() => applyPreset(i)}
+            className={`rounded-full border px-3 py-1 text-[11px] font-medium transition ${
+              activePreset === i
+                ? "border-brand bg-brandTint text-brand"
+                : "border-border bg-surface text-navySoft hover:border-brand/50 hover:text-brand"
+            }`}
+          >
+            {preset.label}
+          </button>
+        ))}
+      </div>
 
       <div className="grid grid-cols-2 gap-3">
         <Field label="User ID" value={values.user_id} onChange={(v) => set("user_id", v)} />

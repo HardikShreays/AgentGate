@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { getConsent, revokeConsent } from "@/lib/api";
 import { ApiError, ConsentResponse } from "@/lib/types";
@@ -19,9 +19,13 @@ export default function ConsentInspectorPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [revoking, setRevoking] = useState(false);
+  // P2-1 — live polling so a revocation fired elsewhere (the demo panel,
+  // another tab, the buyer agent) shows up here without a manual click.
+  const [live, setLive] = useState(true);
+  const pollTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     setError(null);
     try {
       const data = await getConsent(consentId);
@@ -31,13 +35,27 @@ export default function ConsentInspectorPage() {
       setError(e instanceof ApiError ? e.message : "Something went wrong.");
       setConsent(null);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [consentId]);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  // Poll every 2.5s while "Live" is on and the tab is focused. Skipped
+  // silently (no spinner) so it doesn't interrupt reading the page.
+  useEffect(() => {
+    if (pollTimer.current) clearInterval(pollTimer.current);
+    if (!live) return;
+    pollTimer.current = setInterval(() => {
+      if (document.hidden) return;
+      load(true);
+    }, 2500);
+    return () => {
+      if (pollTimer.current) clearInterval(pollTimer.current);
+    };
+  }, [live, load]);
 
   async function handleRevoke() {
     if (!confirm(`Revoke consent ${consentId}? This cannot be undone.`)) return;
@@ -61,6 +79,8 @@ export default function ConsentInspectorPage() {
         onRefresh={load}
         onRevoke={handleRevoke}
         revoking={revoking}
+        live={live}
+        onLiveChange={setLive}
       />
 
       <div className="mx-auto max-w-4xl px-8 py-8">
