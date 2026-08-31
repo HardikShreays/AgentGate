@@ -32,17 +32,16 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="AgentGate API", lifespan=lifespan)
 
-# Phase 6 — the Next.js dashboard (localhost:3000 in dev, the `web`
-# compose service in prod) calls this API from the browser, so it needs
-# CORS. Kept to explicit localhost origins rather than "*" — this is a
-# demo, not a public API, and the dashboard is the only intended client.
+# Phase 6 — the Next.js dashboard calls this API from the browser, so it
+# needs CORS. Allowed origins come from the CORS_ORIGINS env var (a
+# comma-separated list); this is a demo, not a public API, so origins are
+# never "*". Frontend origins are only read once at startup — a server
+# restart is required after changing CORS_ORIGINS.
+settings = get_settings()
+cors_origins = [origin.strip() for origin in settings.CORS_ORIGINS.split(",") if origin.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://web:3000",
-    ],
+    allow_origins=cors_origins,
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
