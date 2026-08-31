@@ -1,4 +1,6 @@
 import {
+  AgentMessageRequest,
+  AgentMessageResponse,
   ApiError,
   AuditTrailResponse,
   ConsentCreateRequest,
@@ -72,6 +74,10 @@ export function confirmPayment(body: ConfirmPaymentRequest): Promise<Transaction
 
 export function getTransactionStatus(transactionId: string): Promise<TransactionStatusResponse> {
   return request(`/transaction/${encodeURIComponent(transactionId)}/status`);
+}
+
+export function sendAgentMessage(body: AgentMessageRequest): Promise<AgentMessageResponse> {
+  return request(`/agent/message`, { method: "POST", body: JSON.stringify(body) });
 }
 
 export function getDemoMode(): Promise<DemoModeResponse> {

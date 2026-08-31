@@ -35,9 +35,13 @@ export function Sidebar() {
     if (stored) setLookup(stored);
   }, []);
 
+  // /transactions/tx/[id] (P1-3) is transaction-scoped, not
+  // consent-scoped, so it's excluded here — the sidebar's "Transaction
+  // Timeline" link should keep pointing at the last known consent-level
+  // timeline rather than trying to treat a transaction id as one.
   const currentId = pathname?.startsWith("/consent/")
     ? pathname.split("/")[2]
-    : pathname?.startsWith("/transactions/")
+    : pathname?.startsWith("/transactions/") && !pathname.startsWith("/transactions/tx/")
       ? pathname.split("/")[2]
       : undefined;
 
@@ -103,7 +107,15 @@ export function Sidebar() {
         <NavLink
           href={currentId ? `/transactions/${currentId}` : "/"}
           label="Transaction Timeline"
-          active={pathname?.startsWith("/transactions/") ?? false}
+          active={
+            (pathname?.startsWith("/transactions/") && !pathname.startsWith("/transactions/tx/")) ??
+            false
+          }
+        />
+        <NavLink
+          href="/agent"
+          label="Buyer Agent chat"
+          active={pathname?.startsWith("/agent") ?? false}
         />
 
         <div className="mb-1.5 mt-5 px-3 text-[10px] font-medium uppercase tracking-label text-faint">

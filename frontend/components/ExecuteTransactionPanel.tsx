@@ -1,9 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { confirmPayment, executeTransaction, getTransactionStatus } from "@/lib/api";
 import { ApiError, ExecuteTransactionResponse, TransactionStatusResponse } from "@/lib/types";
-import { formatInr, formatTime } from "@/lib/format";
+import { formatInr } from "@/lib/format";
+import { TransactionStatusCard } from "@/components/TransactionStatusStepper";
+import { CopyButton } from "@/components/CopyButton";
 
 const RAZORPAY_KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
 
@@ -288,7 +291,10 @@ export function ExecuteTransactionPanel({
               <div className="text-[11px] font-semibold uppercase tracking-label text-brand">
                 Real Razorpay order created
               </div>
-              <div className="mt-1 font-mono text-xs text-navySoft">{result.razorpay_order_id}</div>
+              <div className="mt-1 flex items-center gap-1 font-mono text-xs text-navySoft">
+                <span className="truncate">{result.razorpay_order_id}</span>
+                <CopyButton value={result.razorpay_order_id} label="Order ID" />
+              </div>
               <p className="mt-1.5 leading-relaxed">{result.reasoning}</p>
               <button
                 type="button"
@@ -302,7 +308,17 @@ export function ExecuteTransactionPanel({
           )}
 
           {(polling || txStatus) && (
-            <TransactionStatusCard status={txStatus} polling={polling} />
+            <div className="space-y-1.5">
+              <TransactionStatusCard status={txStatus} polling={polling} />
+              {result.transaction_id && (
+                <Link
+                  href={`/transactions/tx/${encodeURIComponent(result.transaction_id)}`}
+                  className="inline-block text-[11px] font-medium text-brand hover:underline"
+                >
+                  View full attempt history →
+                </Link>
+              )}
+            </div>
           )}
         </div>
       )}
@@ -315,73 +331,4 @@ function toneForDenial(reason?: string | null) {
     return { border: "border-revoked/30", bg: "bg-revokedTint", text: "text-revoked" };
   }
   return { border: "border-danger/30", bg: "bg-dangerTint", text: "text-danger" };
-}
-
-function TransactionStatusCard({
-  status,
-  polling,
-}: {
-  status: TransactionStatusResponse | null;
-  polling: boolean;
-}) {
-  return (
-    <div className="rounded-sm border border-border bg-surfaceMuted p-3">
-      <div className="flex items-center justify-between">
-        <span className="text-[11px] font-medium uppercase tracking-label text-faint">
-          Transaction status
-        </span>
-        {polling && (
-          <span className="flex items-center gap-1.5 text-[11px] text-muted">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand" />
-            watching for webhook…
-          </span>
-        )}
-      </div>
-
-      {!status ? (
-        <p className="mt-1.5 text-xs text-muted">Waiting on the first status read…</p>
-      ) : (
-        <>
-          <div className="mt-1.5 flex items-center gap-2">
-            <StatusPill status={status.status} />
-            <span className="font-mono text-xs text-navySoft">
-              {status.attempt_count}/{status.max_attempts} attempts
-            </span>
-          </div>
-          <ol className="mt-2 space-y-1.5">
-            {status.attempts.map((a) => (
-              <li key={a.attempt} className="flex items-center justify-between gap-2 text-xs">
-                <span className="font-mono text-faint">#{a.attempt}</span>
-                <StatusPill status={a.status} small />
-                <span className="min-w-0 flex-1 truncate text-muted" title={a.error_reason ?? ""}>
-                  {a.error_reason ?? "—"}
-                </span>
-                <span className="shrink-0 font-mono text-faint">
-                  {a.resolved_at ? formatTime(a.resolved_at) : a.created_at ? formatTime(a.created_at) : ""}
-                </span>
-              </li>
-            ))}
-          </ol>
-        </>
-      )}
-    </div>
-  );
-}
-
-function StatusPill({ status, small }: { status: string; small?: boolean }) {
-  const tone =
-    status === "captured"
-      ? "bg-successTint text-success"
-      : status === "failed" || status === "denied"
-        ? "bg-dangerTint text-danger"
-        : "bg-warningTint text-warning";
-  return (
-    <span
-      className={`rounded-full font-semibold uppercase tracking-label ${tone} ${
-        small ? "px-1.5 py-0.5 text-[10px]" : "px-2 py-0.5 text-[11px]"
-      }`}
-    >
-      {status}
-    </span>
-  );
 }

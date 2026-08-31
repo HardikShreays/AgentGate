@@ -1,7 +1,10 @@
 export function formatInr(value: string | number): string {
   const n = typeof value === "string" ? parseFloat(value) : value;
-  if (Number.isNaN(n)) return "—";
-  return `₹${n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  if (Number.isNaN(n)) return "-";
+  return `₹${n.toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 }
 
 export function formatDateTime(iso: string): string {
@@ -31,13 +34,14 @@ export function formatTime(iso: string): string {
 
 export function truncateMiddle(value: string, head = 10, tail = 8): string {
   if (value.length <= head + tail + 3) return value;
-  return `${value.slice(0, head)}…${value.slice(-tail)}`;
+  return `${value.slice(0, head)}...${value.slice(-tail)}`;
 }
 
 export function relativeExpiry(iso: string): { label: string; expired: boolean } {
-  const now = Date.now();
   const then = new Date(iso).getTime();
-  const diffMs = then - now;
+  if (Number.isNaN(then)) return { label: iso, expired: false };
+
+  const diffMs = then - Date.now();
   const expired = diffMs <= 0;
   const abs = Math.abs(diffMs);
   const days = Math.floor(abs / (1000 * 60 * 60 * 24));

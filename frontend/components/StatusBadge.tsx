@@ -25,7 +25,7 @@ export function IntegrityBadge({ valid }: { valid: boolean }) {
         valid ? "bg-successTint text-success" : "bg-dangerTint text-danger"
       }`}
     >
-      {valid ? "✓ Verified" : "✕ Tampered"}
+      {valid ? "Verified" : "Tampered"}
     </span>
   );
 }

@@ -1,8 +1,3 @@
-// Minimal ambient typing for Razorpay's Checkout.js, loaded via a plain
-// <script> tag (app/layout.tsx) rather than an npm package — Razorpay
-// doesn't ship first-party TS types for the client-side checkout script,
-// only the server-side `razorpay` SDK (already used in the backend).
-
 export interface RazorpayCheckoutOptions {
   key: string;
   amount?: number;

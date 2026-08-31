@@ -16,6 +16,7 @@ export function JsonPanel({
   return (
     <div>
       <button
+        type="button"
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-1.5 font-mono text-[11px] font-medium uppercase tracking-label text-faint transition hover:text-brand"
       >

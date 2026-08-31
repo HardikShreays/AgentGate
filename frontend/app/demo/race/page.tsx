@@ -7,6 +7,7 @@ import { truncateMiddle } from "@/lib/format";
 import { Timeline } from "@/components/Timeline";
 import { DemoModeNotice } from "@/components/DemoModeNotice";
 import { RaceResultCards } from "@/components/RaceResultCards";
+import { CopyButton } from "@/components/CopyButton";
 
 // spend_limit === per_txn_max so the *remaining balance* is the binding
 // constraint being tested, not the per-transaction cap — matches
@@ -177,8 +178,11 @@ export default function RaceDemoPage() {
           <div className="space-y-4">
             <div className="rounded-lg border border-border bg-surfaceMuted p-4">
               <div className="text-[11px] font-medium uppercase tracking-label text-faint">Consent</div>
-              <div className="mt-1 font-mono text-sm text-navy" title={lastRun.consentId}>
-                {lastRun.consentId}
+              <div className="mt-1 flex items-center gap-1 font-mono text-sm text-navy">
+                <span className="truncate" title={lastRun.consentId}>
+                  {lastRun.consentId}
+                </span>
+                <CopyButton value={lastRun.consentId} label="Consent ID" />
               </div>
             </div>
 

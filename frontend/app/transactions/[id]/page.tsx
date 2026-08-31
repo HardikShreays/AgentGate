@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { getAuditTrail, getConsent } from "@/lib/api";
 import { ApiError, AuditLogEntry, ConsentStatus } from "@/lib/types";
@@ -15,9 +15,14 @@ export default function TransactionTimelinePage() {
   const [status, setStatus] = useState<ConsentStatus | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  // P2-1 — live polling so a revocation or transaction fired elsewhere
+  // (the demo panels, another tab, the buyer agent) shows up here
+  // without a manual refresh click.
+  const [live, setLive] = useState(true);
+  const pollTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     setError(null);
     try {
       const [trail, consent] = await Promise.all([
@@ -31,7 +36,7 @@ export default function TransactionTimelinePage() {
       setError(e instanceof ApiError ? e.message : "Something went wrong.");
       setEntries(null);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [consentId]);
 
@@ -39,9 +44,29 @@ export default function TransactionTimelinePage() {
     load();
   }, [load]);
 
+  // Poll every 2.5s while "Live" is on and the tab is focused.
+  useEffect(() => {
+    if (pollTimer.current) clearInterval(pollTimer.current);
+    if (!live) return;
+    pollTimer.current = setInterval(() => {
+      if (document.hidden) return;
+      load(true);
+    }, 2500);
+    return () => {
+      if (pollTimer.current) clearInterval(pollTimer.current);
+    };
+  }, [live, load]);
+
   return (
     <>
-      <TopBar consentId={consentId} status={status} page="transactions" onRefresh={load} />
+      <TopBar
+        consentId={consentId}
+        status={status}
+        page="transactions"
+        onRefresh={load}
+        live={live}
+        onLiveChange={setLive}
+      />
 
       <div className="mx-auto max-w-4xl px-8 py-8">
         {loading && <LoadingState />}

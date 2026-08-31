@@ -5,31 +5,35 @@ import { getDemoMode, setDemoMode } from "@/lib/api";
 import { ApiError } from "@/lib/types";
 
 export function DemoModeNotice({ mode }: { mode: "true" | "false" }) {
-  const desired = mode === "true";
-  const [enabled, setEnabled] = useState<boolean | null>(null);
-  const [saving, setSaving] = useState(false);
+  const expected = mode === "true";
+  const [actual, setActual] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function refresh() {
+    setLoading(true);
+    setError(null);
     try {
-      const res = await getDemoMode();
-      setEnabled(res.enabled);
-      setError(null);
+      const response = await getDemoMode();
+      setActual(response.enabled);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Could not read demo mode.");
+    } finally {
+      setLoading(false);
     }
   }
 
-  async function applyDesiredMode() {
-    setSaving(true);
+  async function applyExpected() {
+    setUpdating(true);
     setError(null);
     try {
-      const res = await setDemoMode(desired);
-      setEnabled(res.enabled);
+      const response = await setDemoMode(expected);
+      setActual(response.enabled);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Could not update demo mode.");
     } finally {
-      setSaving(false);
+      setUpdating(false);
     }
   }
 
@@ -37,64 +41,67 @@ export function DemoModeNotice({ mode }: { mode: "true" | "false" }) {
     refresh();
   }, []);
 
-  const matches = enabled === desired;
+  const matches = actual === expected;
+  const tone =
+    actual == null || loading
+      ? "border-border bg-surfaceMuted text-muted"
+      : matches
+        ? "border-success/25 bg-successTint text-success"
+        : "border-warning/30 bg-warningTint text-warning";
 
   return (
-    <div
-      className={`rounded-lg border px-4 py-3 text-xs leading-relaxed ${
-        matches ? "border-success/25 bg-successTint text-navy" : "border-warning/30 bg-warningTint text-navy"
-      }`}
-    >
+    <div className={`rounded-lg border p-4 text-sm ${tone}`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <span className={`font-semibold uppercase tracking-label ${matches ? "text-success" : "text-warning"}`}>
-            DEMO_MODE should be {mode}
-          </span>
-          {" — "}
-          current API value:{" "}
-          <code className="font-mono">
-            {enabled == null ? "checking…" : String(enabled)}
-          </code>
+          <div className="text-[11px] font-semibold uppercase tracking-label">
+            Requires DEMO_MODE={mode}
+          </div>
+          <p className="mt-1 leading-relaxed">
+            {loading
+              ? "Checking the API setting..."
+              : error
+                ? error
+                : actual == null
+                  ? "Could not confirm the current API setting."
+                  : matches
+                    ? "The API is set for this demo."
+                    : `The API currently reports DEMO_MODE=${String(actual)}; switch it before running this demo.`}
+          </p>
         </div>
-        <button
-          type="button"
-          onClick={applyDesiredMode}
-          disabled={saving || matches}
-          className="rounded-sm border border-border bg-surface px-3 py-1.5 text-[11px] font-semibold text-navySoft transition hover:border-brand/50 hover:text-brand disabled:opacity-50"
-        >
-          {saving ? "Switching…" : desired ? "Enable revocation demo mode" : "Switch demo mode off"}
-        </button>
+        <div className="flex shrink-0 gap-2">
+          <button
+            type="button"
+            onClick={refresh}
+            disabled={loading || updating}
+            className="rounded-sm border border-current/25 bg-white/60 px-3 py-1.5 text-xs font-medium transition hover:bg-white disabled:opacity-50"
+          >
+            Recheck
+          </button>
+          {!matches && (
+            <button
+              type="button"
+              onClick={applyExpected}
+              disabled={loading || updating}
+              className="rounded-sm bg-brand px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brandDark disabled:opacity-50"
+            >
+              {updating ? "Switching..." : `Set ${mode}`}
+            </button>
+          )}
+        </div>
       </div>
-      <p className="mt-2">
-        {mode === "true" ? (
-          <>
-            Enables <code className="font-mono">simulate_delay_ms</code> for this revocation demo.
-            Switch it off before running the race demo or recording the happy path.
-          </>
-        ) : (
-          <>
-            Keeps the API in normal mode. The race demo does not need{" "}
-            <code className="font-mono">simulate_delay_ms</code>.
-          </>
-        )}
-      </p>
-      {error && <p className="mt-2 text-danger">{error}</p>}
     </div>
   );
 }
 
-// Rendered instead of a clean pass/fail when a run's outcome is only
-// explainable by DEMO_MODE being set the wrong way — a real Razorpay
-// order appearing where a clean denial was expected, or vice versa.
 export function DemoModeMismatch({ mode }: { mode: "true" | "false" }) {
   return (
-    <div className="rounded-lg border border-danger/30 bg-dangerTint p-4 text-sm text-danger">
+    <div className="rounded-lg border border-warning/30 bg-warningTint p-4 text-sm text-warning">
       <div className="text-[11px] font-semibold uppercase tracking-label">
-        DEMO_MODE does not match this demo
+        DEMO_MODE looks wrong
       </div>
       <p className="mt-1.5 leading-relaxed">
-        This run&apos;s result only makes sense if the API isn&apos;t currently running with{" "}
-        <code className="font-mono">DEMO_MODE={mode}</code>. Use the switch above and try again.
+        This result created an order where the demo expects a guarded abort. Set the API to
+        DEMO_MODE={mode}, then run it again.
       </p>
     </div>
   );

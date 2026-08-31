@@ -121,6 +121,18 @@ export interface TransactionStatusResponse {
   attempts: TransactionAttempt[];
 }
 
+// Mirrors backend AgentMessageRequest/response (app/schemas.py,
+// app/main.py POST /agent/message). Deliberately thin — per README §4
+// the endpoint has no streaming and no session/thread persistence, so
+// each call is a fresh agent invocation with no memory of prior turns.
+export interface AgentMessageRequest {
+  message: string;
+}
+
+export interface AgentMessageResponse {
+  response: string;
+}
+
 export class ApiError extends Error {
   status: number;
   constructor(message: string, status: number) {

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ConsentStatus } from "@/lib/types";
 import { ConsentStatusBadge } from "./StatusBadge";
+import { CopyButton } from "./CopyButton";
 
 export function TopBar({
   consentId,
@@ -9,6 +10,8 @@ export function TopBar({
   onRefresh,
   onRevoke,
   revoking,
+  live,
+  onLiveChange,
 }: {
   consentId: string;
   status?: ConsentStatus;
@@ -16,6 +19,10 @@ export function TopBar({
   onRefresh: () => void;
   onRevoke?: () => void;
   revoking?: boolean;
+  // P2-1 — optional live-polling toggle. Omit `live`/`onLiveChange` on
+  // pages that don't poll (the checkbox simply doesn't render).
+  live?: boolean;
+  onLiveChange?: (value: boolean) => void;
 }) {
   return (
     <div className="sticky top-0 z-10 border-b border-border bg-surface/85 px-8 py-4 backdrop-blur">
@@ -35,12 +42,26 @@ export function TopBar({
               Transaction Timeline
             </TabLink>
           </div>
-          <h1 className="mt-2 truncate font-mono text-sm text-navySoft" title={consentId}>
-            {consentId}
+          <h1 className="mt-2 flex min-w-0 items-center gap-1 font-mono text-sm text-navySoft">
+            <span className="truncate" title={consentId}>
+              {consentId}
+            </span>
+            <CopyButton value={consentId} label="Consent ID" />
           </h1>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {status && <ConsentStatusBadge status={status} />}
+          {onLiveChange && (
+            <label className="flex items-center gap-1.5 text-[11px] text-muted">
+              <input
+                type="checkbox"
+                checked={live ?? false}
+                onChange={(e) => onLiveChange(e.target.checked)}
+                className="accent-brand"
+              />
+              Live
+            </label>
+          )}
           <button
             onClick={onRefresh}
             className="rounded-sm border border-border bg-surface px-3 py-1.5 text-xs font-medium text-navySoft transition hover:border-brand/50 hover:text-brand"

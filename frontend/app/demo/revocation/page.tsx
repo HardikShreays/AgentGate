@@ -6,6 +6,7 @@ import { ApiError, AuditLogEntry, ExecuteTransactionResponse } from "@/lib/types
 import { truncateMiddle } from "@/lib/format";
 import { Timeline } from "@/components/Timeline";
 import { DemoModeNotice, DemoModeMismatch } from "@/components/DemoModeNotice";
+import { CopyButton } from "@/components/CopyButton";
 
 // Same values CreateConsentForm ships with, so this run lines up with the
 // README's happy-path numbers if someone cross-checks it live.
@@ -183,8 +184,11 @@ export default function RevocationDemoPage() {
           <div className="space-y-4">
             <div className="rounded-lg border border-border bg-surfaceMuted p-4">
               <div className="text-[11px] font-medium uppercase tracking-label text-faint">Consent</div>
-              <div className="mt-1 font-mono text-sm text-navy" title={lastRun.consentId}>
-                {lastRun.consentId}
+              <div className="mt-1 flex items-center gap-1 font-mono text-sm text-navy">
+                <span className="truncate" title={lastRun.consentId}>
+                  {lastRun.consentId}
+                </span>
+                <CopyButton value={lastRun.consentId} label="Consent ID" />
               </div>
             </div>
 
