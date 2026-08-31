@@ -5,6 +5,7 @@ import {
   ConsentResponse,
   ConsentRevokeResponse,
   ConfirmPaymentRequest,
+  DemoModeResponse,
   ExecuteTransactionRequest,
   ExecuteTransactionResponse,
   TransactionStatusResponse,
@@ -71,6 +72,14 @@ export function confirmPayment(body: ConfirmPaymentRequest): Promise<Transaction
 
 export function getTransactionStatus(transactionId: string): Promise<TransactionStatusResponse> {
   return request(`/transaction/${encodeURIComponent(transactionId)}/status`);
+}
+
+export function getDemoMode(): Promise<DemoModeResponse> {
+  return request(`/demo-mode`);
+}
+
+export function setDemoMode(enabled: boolean): Promise<DemoModeResponse> {
+  return request(`/demo-mode`, { method: "POST", body: JSON.stringify({ enabled }) });
 }
 
 export { API_URL };

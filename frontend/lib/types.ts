@@ -94,6 +94,10 @@ export interface ConfirmPaymentRequest {
   razorpay_signature: string;
 }
 
+export interface DemoModeResponse {
+  enabled: boolean;
+}
+
 export interface TransactionAttempt {
   attempt: number;
   razorpay_order_id?: string | null;

@@ -339,7 +339,8 @@ Same consent, `"amount": 600` → `status: "denied"`,
 `"reason": "per_txn_max_exceeded"`, even with budget remaining.
 
 ### Race-condition test (A.6)
-Requires the API running with `DEMO_MODE=false`.
+Requires runtime demo mode off. In the dashboard, open
+`/demo/race` and click **Switch demo mode off** if needed.
 ```bash
 python backend/scripts/race_test.py --base-url http://localhost:8000
 ```
@@ -361,7 +362,10 @@ invoked again on an already-terminal transaction
 (`test_failure_path.py::test_hard_stop_is_provably_enforced_no_third_attempt_even_if_handle_called_again`).
 
 ### Revocation-mid-transaction demo (the "wow" moment)
-Requires the API running with `DEMO_MODE=true`.
+Requires runtime demo mode on. In the dashboard, open
+`/demo/revocation` and click **Enable revocation demo mode** before
+running it. This toggles the API process at runtime; no backend restart
+is required.
 ```bash
 python backend/scripts/revocation_demo.py --base-url http://localhost:8000 --runs 3
 ```
@@ -373,9 +377,9 @@ trail shows `consent_check` (approved) → `revocation_processed` →
 `consent_check` (denied) → no `order_created` row. Runs 3x by default to
 rule out a timing fluke.
 
-**Remember:** flip `DEMO_MODE` back to `false` before running the
-race-condition test or recording the happy-path/failure-path parts of the
-pitch video — `simulate_delay_ms` must never be honored outside a demo.
+**Remember:** switch demo mode off before running the race-condition test
+or recording the happy-path/failure-path parts of the pitch video —
+`simulate_delay_ms` must never be honored outside the revocation demo.
 
 ---
 

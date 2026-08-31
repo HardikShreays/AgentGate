@@ -21,6 +21,8 @@ from app.schemas import (
     ConsentCreateRequest,
     ConsentResponse,
     ConsentRevokeResponse,
+    DemoModeRequest,
+    DemoModeResponse,
     ExecuteTransactionRequest,
     ExecuteTransactionResponse,
     AuditTrailResponse,
@@ -142,6 +144,17 @@ def confirm_payment(req: ConfirmPaymentRequest, db: Session = Depends(get_db)):
     if status is None:
         raise HTTPException(status_code=404, detail="transaction not found")
     return status
+
+
+@app.get("/demo-mode", response_model=DemoModeResponse)
+def get_demo_mode():
+    return DemoModeResponse(enabled=settings.DEMO_MODE)
+
+
+@app.post("/demo-mode", response_model=DemoModeResponse)
+def set_demo_mode(req: DemoModeRequest):
+    settings.DEMO_MODE = req.enabled
+    return DemoModeResponse(enabled=settings.DEMO_MODE)
 
 
 @app.get("/audit/{consent_id}", response_model=AuditTrailResponse)
