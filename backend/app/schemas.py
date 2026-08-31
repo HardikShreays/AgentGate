@@ -78,6 +78,14 @@ class ConfirmPaymentRequest(BaseModel):
     razorpay_signature: str
 
 
+class DemoModeRequest(BaseModel):
+    enabled: bool
+
+
+class DemoModeResponse(BaseModel):
+    enabled: bool
+
+
 # ---- Transaction status / attempt timeline (Phase 4) ----
 
 class TransactionAttempt(BaseModel):
