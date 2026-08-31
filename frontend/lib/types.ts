@@ -73,8 +73,9 @@ export interface ExecuteTransactionRequest {
 // is the *synchronous* response to POST /transaction/execute — status is
 // "pending" (a real Razorpay order was created, awaiting checkout +
 // webhook) or "denied" (rejected before any order was created). It is
-// never "captured" here — capture only ever shows up later, via
-// GET /transaction/{id}/status, once the webhook lands.
+// never "captured" here — capture shows up later via
+// GET /transaction/{id}/status, after webhook delivery or verified
+// Checkout.js confirmation.
 export interface ExecuteTransactionResponse {
   transaction_id: string | null;
   status: string;
@@ -84,6 +85,13 @@ export interface ExecuteTransactionResponse {
   reason?: string | null;
   reasoning: string;
   consent_remaining?: string | null;
+}
+
+export interface ConfirmPaymentRequest {
+  transaction_id: string;
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
 }
 
 export interface TransactionAttempt {

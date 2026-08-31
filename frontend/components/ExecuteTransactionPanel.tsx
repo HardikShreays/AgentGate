@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { executeTransaction, getTransactionStatus } from "@/lib/api";
+import { confirmPayment, executeTransaction, getTransactionStatus } from "@/lib/api";
 import { ApiError, ExecuteTransactionResponse, TransactionStatusResponse } from "@/lib/types";
 import { formatInr, formatTime } from "@/lib/format";
 
@@ -105,12 +105,26 @@ export function ExecuteTransactionPanel({
       name: "AgentGate — Test Mode",
       description: `${skuCategory} · ${formatInr(res.amount ?? amount)}`,
       theme: { color: "#3395FF" },
-      handler: () => {
-        // Razorpay's own success callback fires client-side, but capture
-        // is only real once the webhook lands server-side (README §3) —
-        // so this just kicks off polling rather than trusting the
-        // callback as the source of truth.
-        if (res.transaction_id) startPolling(res.transaction_id);
+      handler: async (payment) => {
+        if (!res.transaction_id) return;
+        try {
+          const status = await confirmPayment({
+            transaction_id: res.transaction_id,
+            razorpay_order_id: payment.razorpay_order_id,
+            razorpay_payment_id: payment.razorpay_payment_id,
+            razorpay_signature: payment.razorpay_signature,
+          });
+          setTxStatus(status);
+          setPolling(false);
+          setCheckoutNote("Payment signature verified server-side; transaction marked captured.");
+        } catch (e) {
+          setCheckoutNote(
+            e instanceof ApiError
+              ? `Checkout returned, but server confirmation failed: ${e.message}. Polling webhook status.`
+              : "Checkout returned, but server confirmation failed. Polling webhook status."
+          );
+          startPolling(res.transaction_id);
+        }
       },
       modal: {
         ondismiss: () => {

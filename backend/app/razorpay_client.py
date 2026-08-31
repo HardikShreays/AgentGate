@@ -48,3 +48,24 @@ def verify_webhook_signature(client: razorpay.Client, payload_body: str, signatu
     return client.utility.verify_webhook_signature(
         payload_body, signature, settings.RAZORPAY_WEBHOOK_SECRET
     )
+
+
+def verify_payment_signature(
+    client: razorpay.Client,
+    razorpay_order_id: str,
+    razorpay_payment_id: str,
+    razorpay_signature: str,
+) -> bool:
+    """Verify Checkout.js' client-side success callback signature.
+
+    This is separate from webhook verification: the checkout callback is
+    signed with the API key secret over order_id + payment_id, while
+    webhooks are signed with RAZORPAY_WEBHOOK_SECRET over the raw body.
+    """
+    return client.utility.verify_payment_signature(
+        {
+            "razorpay_order_id": razorpay_order_id,
+            "razorpay_payment_id": razorpay_payment_id,
+            "razorpay_signature": razorpay_signature,
+        }
+    )

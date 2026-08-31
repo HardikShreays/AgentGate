@@ -71,6 +71,13 @@ class ExecuteTransactionResponse(BaseModel):
     consent_remaining: Optional[Decimal] = None
 
 
+class ConfirmPaymentRequest(BaseModel):
+    transaction_id: str
+    razorpay_order_id: str
+    razorpay_payment_id: str
+    razorpay_signature: str
+
+
 # ---- Transaction status / attempt timeline (Phase 4) ----
 
 class TransactionAttempt(BaseModel):
