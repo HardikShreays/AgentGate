@@ -1,13 +1,15 @@
-fastapi
-uvicorn
-sqlalchemy
-psycopg2-binary
-pydantic
-pydantic-settings
-python-dotenv
+# Pinned to the versions the 56-test suite is green against (see .github/workflows/ci.yml).
+fastapi==0.141.1
+uvicorn==0.52.4
+SQLAlchemy==2.0.52
+psycopg2-binary==2.9.12
+pydantic==2.13.4
+pydantic-settings==2.15.0
+python-dotenv==1.2.3
+# 2.0.1 moved verify_webhook_signature onto client.utility — see README §3.
 razorpay==2.0.1
-langgraph
-langchain-groq
-langchain-core
-pytest
-httpx
+langgraph==1.2.11
+langchain-groq==1.1.3
+langchain-core==1.6.0
+pytest==9.1.1
+httpx==0.28.1

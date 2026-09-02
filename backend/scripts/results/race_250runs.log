@@ -1,0 +1,1504 @@
+AgentGate — race-condition test (A.6)
+Target: http://localhost:8000
+
+=== Race-condition test — run 1 ===
+  consent_id = 91e0f0f4-e218-4507-a217-fb28d6932c14  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 2 ===
+  consent_id = 432ac0d4-e85f-41eb-a52d-4fdce25aaae7  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 3 ===
+  consent_id = 79586ba3-1e8c-45ff-98c1-d87e37784515  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 4 ===
+  consent_id = 535fd337-1e8c-4053-89f1-d1250b0b945e  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 5 ===
+  consent_id = 92804c57-f8fe-48cc-b8bc-306505ead6c4  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 6 ===
+  consent_id = e8bab922-17a5-46cc-91d1-977f31b0c721  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 7 ===
+  consent_id = 434f8fa6-c764-4a3b-9b05-5375c3ffe227  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 8 ===
+  consent_id = 2c4bd3d0-0c37-4357-a0d9-4d7aeef9779c  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 9 ===
+  consent_id = f8172064-0e4a-45ec-9545-48219cdc5a6a  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 10 ===
+  consent_id = efb7025d-6bde-4b49-9cf6-1b282c7f35ab  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 11 ===
+  consent_id = bf68495e-ba9d-4c1b-b7d2-b77827e20608  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 12 ===
+  consent_id = 424fbd35-286d-4d0a-ae35-05aeab3b5244  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 13 ===
+  consent_id = 9f80fb28-8580-424f-b505-13bc067acb3b  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 14 ===
+  consent_id = 7e6fdfb6-7b3e-4654-8ca1-dd030b87da31  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 15 ===
+  consent_id = dbb5306c-713f-4d9b-84d6-c13ca7692376  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 16 ===
+  consent_id = e4400693-f3ac-4cc6-a0b7-9d8c07f4c975  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 17 ===
+  consent_id = eaeaa3b5-4bb8-4135-92a2-67fb31c9d386  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 18 ===
+  consent_id = 1c5caecd-8ac8-4dad-902c-8b8cec35ad75  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 19 ===
+  consent_id = 5cfdbd2a-7e9c-4fb7-a963-274082682608  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 20 ===
+  consent_id = 2d5d46b8-53d3-4d19-9537-a727892f352f  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 21 ===
+  consent_id = b1631c1c-3730-419f-b28d-feedc3c7870d  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 22 ===
+  consent_id = b7a48e98-feaf-421c-9b67-7d445440ac10  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 23 ===
+  consent_id = 352120c2-5169-4e4d-8c6d-dfdf3dcd4bc3  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 24 ===
+  consent_id = 21cacd30-e312-4663-b9db-3134eb867899  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 25 ===
+  consent_id = c5abeb5a-84d2-440f-b9f8-66e1f4eb6267  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 26 ===
+  consent_id = 649af929-53cd-45a2-ae95-b5024025b953  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 27 ===
+  consent_id = a8ddca10-9593-4a78-bc3c-49cb84824bc2  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 28 ===
+  consent_id = a15de8fb-b6d3-453b-85af-1f210cd587c7  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 29 ===
+  consent_id = 76ef23d7-58b0-4045-9abb-da96bd1c7613  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 30 ===
+  consent_id = 7c62979b-0a0c-402e-a11c-5dfd111354ba  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 31 ===
+  consent_id = 351e74b9-f520-4d81-a7dd-3435fc78e121  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 32 ===
+  consent_id = bd463ca5-c9c3-4b87-82aa-50fc244e0b06  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 33 ===
+  consent_id = f1043007-eebe-4f7f-81b6-2087c41c6072  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 34 ===
+  consent_id = b1bd909a-56f3-4701-a79e-1cdf5b196d53  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 35 ===
+  consent_id = 3fd76bb5-c696-4f18-8cd4-532a480d427e  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 36 ===
+  consent_id = 1e24c249-c861-47b4-9ea7-81c7c8883cb5  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 37 ===
+  consent_id = 27fe0a45-18c4-4731-b79a-d45e0c632681  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 38 ===
+  consent_id = eb3f743f-bcc1-485b-8a3e-216acba9a69e  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 39 ===
+  consent_id = a2b48ee8-c2ef-4f91-87e0-9b25816a63c3  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 40 ===
+  consent_id = bbb2a7d5-7bb8-4344-b762-219001f0e1cb  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 41 ===
+  consent_id = a7939933-6460-41aa-ae20-608b31a1012d  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 42 ===
+  consent_id = 8c89823e-741e-4f69-b4fc-818e64d9c38f  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 43 ===
+  consent_id = 16a46b8b-eecb-4948-902c-c92d03e5d407  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 44 ===
+  consent_id = 75130ef7-8990-48a7-9576-1d273a8e2889  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 45 ===
+  consent_id = 11b3f3dc-7525-4b46-b36c-491112127b2a  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 46 ===
+  consent_id = 694a00fd-b662-4e34-8522-ad63ec0a4883  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 47 ===
+  consent_id = 02343934-df0b-46b2-956f-d0129303617e  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 48 ===
+  consent_id = b9789ed1-e092-4aba-a230-4701185b81cf  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 49 ===
+  consent_id = f3510f99-4453-4e21-9536-527483bca5c8  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 50 ===
+  consent_id = 3fd4b914-d015-4824-8d88-8de5a73a9a99  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 51 ===
+  consent_id = 1aeb955b-3da2-4364-b323-05065bb5beed  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 52 ===
+  consent_id = 46701a1d-b334-4f8e-8397-850785f4758a  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 53 ===
+  consent_id = d2cda5ab-aabf-4661-a5e0-dbe10d628a79  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 54 ===
+  consent_id = ccb15f6b-e530-4801-8362-ee5dbca2197f  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 55 ===
+  consent_id = 30a0e62c-cb98-4102-961f-f7efc67e3679  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 56 ===
+  consent_id = 99058ce0-10a5-4dbf-bb40-1e8c1ebc89aa  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 57 ===
+  consent_id = 174f7298-78d9-423b-8536-516645fa2943  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 58 ===
+  consent_id = edb32e40-d607-4076-835b-a606505d263c  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 59 ===
+  consent_id = 6e46f20d-11f8-467c-acf5-509695b101d1  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 60 ===
+  consent_id = 90f2eed6-3601-4c4d-b7a0-567580778668  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 61 ===
+  consent_id = 4a59acb2-65dd-4f9f-be63-a6d51d848ef8  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 62 ===
+  consent_id = ec736e16-3b2d-448b-ab92-60007a745aa4  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 63 ===
+  consent_id = d732dcf3-4646-4ad8-9200-186d52909b42  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 64 ===
+  consent_id = 3c68345b-fc23-46e4-b934-39be479e8434  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 65 ===
+  consent_id = cbe88419-891b-4677-b6bd-be597508fd72  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 66 ===
+  consent_id = 7f61d1f7-7762-4277-930e-79e2b0de0cd5  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 67 ===
+  consent_id = c01f5ba4-04d1-4352-9322-743007d041e3  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 68 ===
+  consent_id = 8f109c60-f9e7-4aec-8adb-8ad8c63d40ac  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 69 ===
+  consent_id = 0545a145-0068-4ce4-a943-bba4b8cc4c1b  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 70 ===
+  consent_id = 86fe0677-bd13-4225-b322-09225f5dea72  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 71 ===
+  consent_id = 59b04bfc-7fd0-4330-be53-b4c682eaa07a  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 72 ===
+  consent_id = 140b7e34-e598-4541-826d-fa08c70b1824  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 73 ===
+  consent_id = 13c61f2e-b8ab-4e7c-941e-933484186a98  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 74 ===
+  consent_id = c5bfdf39-9882-470b-8e9b-65f29d1be029  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 75 ===
+  consent_id = b6cfbe7f-e269-4086-8460-db598b7f801e  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 76 ===
+  consent_id = a715835e-ec23-4a84-91c3-e67ecf5b8e0c  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 77 ===
+  consent_id = 258a60b6-1124-49de-9126-6bb9412be841  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 78 ===
+  consent_id = 0b591a75-6b5d-407f-9cb7-57c796d69c79  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 79 ===
+  consent_id = 9460d797-c2cc-44fe-b5e3-f84c4187e973  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 80 ===
+  consent_id = fc9bbe6b-31b7-4dc1-be3b-f6a6115b4c92  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 81 ===
+  consent_id = e75ff84b-0847-4fb7-af14-59d9a3b5576d  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 82 ===
+  consent_id = 02443d02-ac36-489a-8737-362da239f78f  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 83 ===
+  consent_id = d7549f90-c99a-4364-91e4-c89045103192  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 84 ===
+  consent_id = 7c8e9435-3bbc-4d6a-8711-8bc18e245008  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 85 ===
+  consent_id = b8e877f5-7dc6-4b7f-a448-37d4beaa07a5  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 86 ===
+  consent_id = 84f0ea78-9db3-487f-aa5b-67f91fca9d69  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 87 ===
+  consent_id = eff896bc-7f36-4410-943b-4a7648c100fd  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 88 ===
+  consent_id = 5033cda6-5619-43f3-b3c7-bbd09917cb99  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 89 ===
+  consent_id = 909b7d17-29a1-40af-9cff-ab4b123dacd0  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 90 ===
+  consent_id = 6f7f29aa-0f74-40a2-bed5-561817f71320  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 91 ===
+  consent_id = e535f7a3-bc9e-49bd-9335-cbf4c83928a8  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 92 ===
+  consent_id = e06d5009-8d03-4458-99d9-eb840bfc449e  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 93 ===
+  consent_id = e3f74f77-2e06-4f5c-b887-544387018bfb  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 94 ===
+  consent_id = 88ead0fe-597f-49b5-a851-d2ff8ac53d0b  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 95 ===
+  consent_id = be5f4bd3-5e5b-4194-af41-63f11e2332f0  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 96 ===
+  consent_id = a775b2aa-4810-48c1-875b-d44a9fa8cec9  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 97 ===
+  consent_id = f747b9f4-f1ff-46c7-8d71-83b46fe5e9fa  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 98 ===
+  consent_id = d391d61f-a92d-4a45-84e2-a28a0e60c032  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 99 ===
+  consent_id = 78c64080-4e89-4f80-b402-3e2d2243b709  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 100 ===
+  consent_id = 18bf3996-1f8a-44f5-ae04-46309ca769b5  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 101 ===
+  consent_id = 5af54db8-4247-443e-9b17-94a4cebccbe9  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 102 ===
+  consent_id = 5f991fc4-bb59-48a4-9efd-5ad71b24a456  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 103 ===
+  consent_id = e2bec8c9-d274-4f14-924d-5b7fc8bf7e3d  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 104 ===
+  consent_id = 59321301-e892-4d2b-912e-f50a22be6404  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 105 ===
+  consent_id = c1306090-52a3-418d-8e03-c0cdce8c105e  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 106 ===
+  consent_id = 8123d2d1-76ae-4f2b-86aa-bd4f86b1202f  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 107 ===
+  consent_id = 4c55ccc0-4558-465a-8869-49e998596f9f  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 108 ===
+  consent_id = 3662495f-ebe3-4270-8ae0-cd3537a324be  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 109 ===
+  consent_id = ce154e7b-833f-4f05-891f-54722fa23ea3  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 110 ===
+  consent_id = dfee44f9-546b-48c4-801e-0f4479ae7c17  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 111 ===
+  consent_id = 83d1306c-898f-4af8-aa72-9fafe50bb2cf  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 112 ===
+  consent_id = 7449b867-c8c7-49c5-a2a4-7f322ffcbdee  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 113 ===
+  consent_id = 8f559b8c-b7bd-44a5-b2e9-0dde36515c8d  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 114 ===
+  consent_id = 9e0bb95f-fe10-4aa8-bdfe-12817505257f  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 115 ===
+  consent_id = 587aa432-d712-4abc-ae72-3772ce334970  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 116 ===
+  consent_id = 7355ce99-4684-43c2-9b2a-98c057286dd8  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 117 ===
+  consent_id = e14fcf06-858a-4f7c-9fcb-1aad4911de49  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 118 ===
+  consent_id = 9b67b354-4946-46dc-b902-3bd808671bda  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 119 ===
+  consent_id = 7f00c398-ab13-45dc-8023-27fd92e23f58  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 120 ===
+  consent_id = d92e0a64-a7a7-469c-b0b3-aa7dd7448916  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 121 ===
+  consent_id = 2ef5892c-826a-4046-98a4-0952678ab8b0  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 122 ===
+  consent_id = a0962467-ad6c-4a2a-9298-5702f3289625  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 123 ===
+  consent_id = 0935d7c1-6a54-433b-b051-1314a5162d9b  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 124 ===
+  consent_id = 3f79ad43-22f7-46a8-b727-1b5fa21a1e82  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 125 ===
+  consent_id = df748c36-a2c6-4da1-8a5e-981f261142dc  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 126 ===
+  consent_id = a296b6ff-0188-4da3-93c2-2f13db0b400d  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 127 ===
+  consent_id = 2b119e5b-ba7a-497b-9ca6-7782725829f0  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 128 ===
+  consent_id = 08ace71d-1308-458d-9c50-7a3c7fc60bd3  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 129 ===
+  consent_id = e216cd32-c5ce-4dc2-83a3-0d2959d56010  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 130 ===
+  consent_id = 64258d36-ad92-41d1-ad63-af5651dc74f8  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 131 ===
+  consent_id = aad4ffab-a66a-4cf8-b3e8-ccfc656c6640  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 132 ===
+  consent_id = 1bd3de7f-2e70-4246-82c4-8c0df68d08ba  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 133 ===
+  consent_id = 06d06657-8374-4a1e-82ac-6c8ed39126da  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 134 ===
+  consent_id = b864a6bd-3210-4959-9c37-9d0c15d9fbab  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 135 ===
+  consent_id = 43d81781-bbce-4864-80e3-c404d7c56b93  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 136 ===
+  consent_id = 48ab7668-395b-41c4-9ad4-4eb86f96a77b  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 137 ===
+  consent_id = a438370f-60e9-4596-ae57-2e0d6bd125ef  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 138 ===
+  consent_id = 1daea3a6-68a4-44d2-a570-7109bf567d50  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 139 ===
+  consent_id = 6eb2d267-0558-4ab9-a50e-6bf357a8495f  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 140 ===
+  consent_id = 0ec15cfe-f2a1-40ff-baac-4b9b974f7963  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 141 ===
+  consent_id = 9c865e51-4743-4459-b438-18aa1530e956  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 142 ===
+  consent_id = 3d3f21a4-16ba-4d8b-a2d9-575035fdcfb2  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 143 ===
+  consent_id = 0a04e5da-f1da-4b7a-b5ba-d829d0e9efed  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 144 ===
+  consent_id = 75c6282c-b52d-453a-8113-63cbcc2d0edc  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 145 ===
+  consent_id = 6ca152f4-e7d3-41b5-96b4-5a68e929e217  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 146 ===
+  consent_id = 2f2ee54d-9b3c-445e-9107-4bdc2acd010a  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 147 ===
+  consent_id = e9c2eb7b-a967-474b-9f87-4796483b6709  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 148 ===
+  consent_id = b531afa8-f7a9-4f94-8230-11f1b34d581c  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 149 ===
+  consent_id = 572b9155-da5a-4473-96cd-dce0c90d38fb  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 150 ===
+  consent_id = 78905f42-dcfc-4664-a4bd-586f822e5729  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 151 ===
+  consent_id = 5c21055a-d24c-4a66-9bc1-22147fecac1c  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 152 ===
+  consent_id = 7b294e9f-1aa3-4b33-bf3e-681d374923c1  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 153 ===
+  consent_id = 7ebd1903-571e-4f3c-8bb6-88e85626294d  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 154 ===
+  consent_id = d549cd9d-7780-45d3-8f93-561b41d33748  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 155 ===
+  consent_id = 36bb4628-b5d1-4646-9b1c-c1c96d6eb6e0  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 156 ===
+  consent_id = 5b92381c-ad85-4bfc-9593-21aa80e5911c  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 157 ===
+  consent_id = 0c6fcfb9-a58b-477b-bb92-592e3f6f3eb7  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 158 ===
+  consent_id = 23df2a91-baaf-4cb9-b0aa-92318548eb8e  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 159 ===
+  consent_id = b007ff71-25f1-45a8-ad6a-eb00cd18faff  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 160 ===
+  consent_id = b9325c14-5235-496d-88a2-d65c0baee421  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 161 ===
+  consent_id = b0b4555c-4838-409e-8bf6-1db871402f81  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 162 ===
+  consent_id = 1150c40c-a90a-43c0-ae8b-6fd6183324b1  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 163 ===
+  consent_id = 0615f6e5-c9a6-437e-b45d-4a74401e8f86  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 164 ===
+  consent_id = 28ade56f-8427-4a93-aeda-57061d93c6db  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 165 ===
+  consent_id = 7954ff4c-4791-4887-856b-09958851a166  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 166 ===
+  consent_id = 60244cc7-f06a-453f-b25d-5f1d95a36ce7  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 167 ===
+  consent_id = 7dc1802b-5c79-4e4f-a904-db34c9def624  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 168 ===
+  consent_id = 0ed54e68-82f5-4214-95d9-fff1136eb4fd  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 169 ===
+  consent_id = ce5ce2b8-6e65-4c5c-817f-1ed671771707  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 170 ===
+  consent_id = a836401f-ecc0-4310-8309-6bc12ce78bd1  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 171 ===
+  consent_id = 12cd851a-3d5c-4974-91bc-6e34ff1b9352  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 172 ===
+  consent_id = 21519d0d-64d2-48ea-ad3e-7dfefa326a85  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 173 ===
+  consent_id = fa9f8db2-d610-4d7d-afc0-07e7ac2e0d11  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 174 ===
+  consent_id = 3f0a517d-2c38-445a-8c65-74796f1a8b78  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 175 ===
+  consent_id = 8ca50eb6-a98f-4a5f-93ec-3eb98682876f  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 176 ===
+  consent_id = 6293f877-e4f5-4b61-b0cd-a4a6ec5a83c2  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 177 ===
+  consent_id = adcb933b-a33b-4c96-b3ab-dc0b958cab06  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 178 ===
+  consent_id = 00b9685e-7eb2-4e41-a354-51b1be502b73  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 179 ===
+  consent_id = 22970d03-9f25-4165-8deb-8e02eeade3a7  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 180 ===
+  consent_id = 187d4e89-5c15-40ad-856e-9df6fbda99a8  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 181 ===
+  consent_id = e356ed79-83a7-4e49-a366-eba25eb301d1  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 182 ===
+  consent_id = a5dcf738-a2d3-48d9-bdce-0c695a551e80  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 183 ===
+  consent_id = 23d869d1-4a36-4041-ad5e-b7789f120bf3  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 184 ===
+  consent_id = 53f980ab-72d7-4f4b-88c0-a82f357e495b  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 185 ===
+  consent_id = e77225f5-69b9-4dc2-a049-7faa608a29cc  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 186 ===
+  consent_id = 5912605d-84a9-41e7-b009-1b115b79e7a6  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 187 ===
+  consent_id = 44b27cab-7235-4765-89b1-9b838f06a818  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 188 ===
+  consent_id = eb5686c5-dc97-4033-87e0-b31491b2899b  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 189 ===
+  consent_id = 4f8fe01a-1c12-44ca-955e-7ec775e08f13  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 190 ===
+  consent_id = f2294fed-3ff8-4625-a9c3-21d3c4d83ca6  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 191 ===
+  consent_id = decb430b-dd9e-49ae-9f38-6daf290862a1  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 192 ===
+  consent_id = 6bbff175-01c2-4550-b203-919325af9e9d  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 193 ===
+  consent_id = e9aeb902-7a4f-4d54-a24a-b206ec21cf87  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 194 ===
+  consent_id = 6a463568-2ab2-49d8-9fbf-84c52007fada  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 195 ===
+  consent_id = e0090f3d-3353-4990-8e0f-d4145058f091  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 196 ===
+  consent_id = ba6b44cb-44b0-4231-8355-9492f3d7a432  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 197 ===
+  consent_id = abf2e98c-be5e-43d6-b205-9f23ebff87be  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 198 ===
+  consent_id = d996ec8a-a777-4cfc-a3f8-6d1ad5a2954c  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 199 ===
+  consent_id = c9646156-429d-4c47-9a0f-68d218638d21  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 200 ===
+  consent_id = e109ca68-5dd2-4b1d-b912-675f46c9f338  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 201 ===
+  consent_id = eebc2102-1a4e-409e-a713-d5e2b072598d  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 202 ===
+  consent_id = 7269ac9d-f035-456e-a7ce-cbfb1d4d5a59  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 203 ===
+  consent_id = cd122359-18a4-4b86-99e6-24bae4a15b8c  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 204 ===
+  consent_id = 68c18c65-520b-4b52-b3b9-1d6f65eaa1c0  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 205 ===
+  consent_id = 9fb2f976-6b2c-4d12-83f2-ed58eff301a3  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 206 ===
+  consent_id = 60824eee-9ea7-4875-ae26-1ad84a93c329  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 207 ===
+  consent_id = 49725107-b697-476b-82c3-09e399d91a81  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 208 ===
+  consent_id = e6d4642b-46bd-45cc-87b5-82cb0298187e  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 209 ===
+  consent_id = c794a051-7d28-43b1-9a73-f0ecae43f522  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 210 ===
+  consent_id = 24093fed-447d-479e-ae35-81eeb1ad2488  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 211 ===
+  consent_id = 33e62a8e-678f-4b3d-8bf1-9212f91edac7  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 212 ===
+  consent_id = a5c1513e-cf1c-405d-a84d-150e57c45325  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 213 ===
+  consent_id = a124115a-524e-47c1-bea9-563fbfaccc56  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 214 ===
+  consent_id = f66ea460-3f51-44d9-a2e6-8743a5aa0820  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 215 ===
+  consent_id = 122fdf79-7613-40de-86f5-b28537187b32  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 216 ===
+  consent_id = 87db54cf-32ae-4b28-9457-037d1b533eab  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 217 ===
+  consent_id = e69d2a3b-72aa-48ea-9162-04b55029aa54  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 218 ===
+  consent_id = 6b2dcf53-544d-4406-bb98-75d7464dfa7c  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 219 ===
+  consent_id = bd5051d2-3666-4280-8190-7950d3135bef  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 220 ===
+  consent_id = 133732cd-ba03-4a5e-96c2-8d22b70feadf  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 221 ===
+  consent_id = f007597e-61f4-4ec1-9623-6a8a9d6c78a8  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 222 ===
+  consent_id = 6fba0f07-6f8a-4680-bf81-cefd8568c75c  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 223 ===
+  consent_id = 050372b3-8645-4405-859e-e9273d1b97b8  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 224 ===
+  consent_id = 0352b9c9-9530-43b1-89d8-f4d60ae5702c  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 225 ===
+  consent_id = eaa1acc1-5da8-463e-92b9-a8779b556cc9  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 226 ===
+  consent_id = 4a881603-08aa-407a-81c9-e1937f6b1562  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 227 ===
+  consent_id = 9b6061f9-09f4-4fea-bdf4-578604b76920  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 228 ===
+  consent_id = dd2ee8b5-a0d1-4a51-b046-a314f681321c  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 229 ===
+  consent_id = 6fa4b655-a052-42e1-a974-567eea9b6845  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 230 ===
+  consent_id = db497027-2685-42cf-ad0f-8d982e2a8831  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 231 ===
+  consent_id = 6f6a46bb-ac1d-46cc-94c3-3bfa668e5d62  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 232 ===
+  consent_id = 8c6ae48b-fdd4-4008-8ae7-b4c3cc2a22b1  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 233 ===
+  consent_id = 36c08b6f-3205-418f-9f60-233867ed9c94  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 234 ===
+  consent_id = 770c4866-b212-4148-b407-ee52ac535ec2  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 235 ===
+  consent_id = b188242e-c2d4-483f-a61c-b447bca8a07c  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 236 ===
+  consent_id = 980fab3e-115d-4625-bb86-5777661d8e89  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 237 ===
+  consent_id = 71b67bf1-1a89-41ab-96d6-d53d08301794  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 238 ===
+  consent_id = 1340a1e1-2dea-42cd-a4db-9eaaf9be37b9  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 239 ===
+  consent_id = a29d2681-c224-4e35-a804-0f22a17f3969  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 240 ===
+  consent_id = a7bb51a2-a197-4f74-b038-75a8c7fb2e6f  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 241 ===
+  consent_id = 867ddf3e-1e83-4a15-8d92-40b6ee52fa3d  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 242 ===
+  consent_id = 7db1d300-ddd1-4964-b9ec-67a8b60434b0  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 243 ===
+  consent_id = 4653a80e-f6cf-4dda-a9d3-9a5d3de35491  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 244 ===
+  consent_id = bd0d0bb6-59a1-4bc5-8342-e029f2975238  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 245 ===
+  consent_id = b5ab6cbb-b2ce-4018-8c84-eba149a563b0  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 246 ===
+  consent_id = 3de50413-c5fa-452c-978f-81fd0cfcff33  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 247 ===
+  consent_id = 989bb11d-5fa7-4cdf-80dd-452fc816b03b  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 248 ===
+  consent_id = 1095f82e-87f2-4791-93b4-be3ea0206442  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=pending reason=None
+  request 1: status=denied reason=insufficient_remaining_balance
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 249 ===
+  consent_id = 1fa4efea-c578-45d0-b1f3-5198506604bf  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+=== Race-condition test — run 250 ===
+  consent_id = e3254a09-0545-44c2-835a-fdb0f10e308a  (spend_limit=500.00, per_txn_max=500.00)
+  request 0: status=denied reason=insufficient_remaining_balance
+  request 1: status=pending reason=None
+  PASS: exactly one request accepted, one denied, race_condition_detected logged.
+
+250/250 runs closed the race correctly.

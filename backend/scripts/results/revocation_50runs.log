@@ -1,0 +1,603 @@
+AgentGate — revocation-mid-transaction demo
+Target: http://localhost:8000  (requires DEMO_MODE=true on the server)
+
+=== Revocation demo — run 1 ===
+  consent_id = cd8dd8c7-8a38-4ccf-a4f1-5f02afbe7e85
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'cd8dd8c7-8a38-4ccf-a4f1-5f02afbe7e85', 'status': 'revoked', 'revoked_at': '2026-09-02T17:28:12.050936Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:28:12.050936+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 2 ===
+  consent_id = 6808c7ec-aba9-414f-93a3-045141daae03
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '6808c7ec-aba9-414f-93a3-045141daae03', 'status': 'revoked', 'revoked_at': '2026-09-02T17:28:16.517711Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:28:16.517711+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 3 ===
+  consent_id = 44c9f4ae-ebd8-43fa-909c-1515b3233c8f
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '44c9f4ae-ebd8-43fa-909c-1515b3233c8f', 'status': 'revoked', 'revoked_at': '2026-09-02T17:28:21.226815Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:28:21.226815+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 4 ===
+  consent_id = 326c0f8f-edee-4a1e-ab72-d2f0a5076ff5
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '326c0f8f-edee-4a1e-ab72-d2f0a5076ff5', 'status': 'revoked', 'revoked_at': '2026-09-02T17:28:26.078833Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:28:26.078833+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 5 ===
+  consent_id = 3f589973-810c-4301-a905-2ca863a26c6e
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '3f589973-810c-4301-a905-2ca863a26c6e', 'status': 'revoked', 'revoked_at': '2026-09-02T17:28:31.820674Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:28:31.820674+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 6 ===
+  consent_id = 084c10d0-baae-4de7-ab24-9596de5a3ce3
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '084c10d0-baae-4de7-ab24-9596de5a3ce3', 'status': 'revoked', 'revoked_at': '2026-09-02T17:28:36.908553Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:28:36.908553+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 7 ===
+  consent_id = b5634e95-1d31-4eb4-8761-3d155c051c2c
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'b5634e95-1d31-4eb4-8761-3d155c051c2c', 'status': 'revoked', 'revoked_at': '2026-09-02T17:28:42.299846Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:28:42.299846+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 8 ===
+  consent_id = 1eb02b6f-02f3-48ab-a9e7-c622ca92c212
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '1eb02b6f-02f3-48ab-a9e7-c622ca92c212', 'status': 'revoked', 'revoked_at': '2026-09-02T17:28:46.900438Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:28:46.900438+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 9 ===
+  consent_id = 01670e45-dd85-4861-b19d-3bcb276a56e3
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '01670e45-dd85-4861-b19d-3bcb276a56e3', 'status': 'revoked', 'revoked_at': '2026-09-02T17:28:51.670696Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:28:51.670696+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 10 ===
+  consent_id = 5328a0ab-6b2d-482c-ae2d-46231174531b
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '5328a0ab-6b2d-482c-ae2d-46231174531b', 'status': 'revoked', 'revoked_at': '2026-09-02T17:28:57.384958Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:28:57.384958+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 11 ===
+  consent_id = 0685dc77-f54f-4e63-84a3-e1554ef46564
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '0685dc77-f54f-4e63-84a3-e1554ef46564', 'status': 'revoked', 'revoked_at': '2026-09-02T17:29:02.287740Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:29:02.287740+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 12 ===
+  consent_id = 80823819-b291-4f0f-839b-73a116f44b6d
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '80823819-b291-4f0f-839b-73a116f44b6d', 'status': 'revoked', 'revoked_at': '2026-09-02T17:29:07.156726Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:29:07.156726+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 13 ===
+  consent_id = c138de81-bf46-477f-a128-f84cf92f35dc
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'c138de81-bf46-477f-a128-f84cf92f35dc', 'status': 'revoked', 'revoked_at': '2026-09-02T17:29:11.918883Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:29:11.918883+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 14 ===
+  consent_id = addebfa1-272e-4b46-af11-6ffdaf6e3b0c
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'addebfa1-272e-4b46-af11-6ffdaf6e3b0c', 'status': 'revoked', 'revoked_at': '2026-09-02T17:29:16.600622Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:29:16.600622+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 15 ===
+  consent_id = 28c4bb93-b19a-473d-9ab7-8420d5a03d33
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '28c4bb93-b19a-473d-9ab7-8420d5a03d33', 'status': 'revoked', 'revoked_at': '2026-09-02T17:29:22.860877Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:29:22.860877+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 16 ===
+  consent_id = 0897952a-a71f-4835-9e68-0d4d6390dc9a
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '0897952a-a71f-4835-9e68-0d4d6390dc9a', 'status': 'revoked', 'revoked_at': '2026-09-02T17:29:27.848938Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:29:27.848938+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 17 ===
+  consent_id = 3d9fdac5-5d4f-40c3-8416-c5224c6df8c7
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '3d9fdac5-5d4f-40c3-8416-c5224c6df8c7', 'status': 'revoked', 'revoked_at': '2026-09-02T17:29:32.689566Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:29:32.689566+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 18 ===
+  consent_id = c34f4fff-fa87-4e42-8eee-6641819869b7
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'c34f4fff-fa87-4e42-8eee-6641819869b7', 'status': 'revoked', 'revoked_at': '2026-09-02T17:29:37.337445Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:29:37.337445+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 19 ===
+  consent_id = 81151a8c-749f-4f72-9195-c19b75ecef20
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '81151a8c-749f-4f72-9195-c19b75ecef20', 'status': 'revoked', 'revoked_at': '2026-09-02T17:29:42.095418Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:29:42.095418+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 20 ===
+  consent_id = 93e89415-7b9c-4367-a8eb-361c7aaf8673
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '93e89415-7b9c-4367-a8eb-361c7aaf8673', 'status': 'revoked', 'revoked_at': '2026-09-02T17:29:48.284785Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:29:48.284785+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 21 ===
+  consent_id = 449cb3e3-b140-40f9-985a-b1b6c4de9a1f
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '449cb3e3-b140-40f9-985a-b1b6c4de9a1f', 'status': 'revoked', 'revoked_at': '2026-09-02T17:29:53.895938Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:29:53.895938+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 22 ===
+  consent_id = 4176a7e2-84e9-4739-9da0-74be2af95159
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '4176a7e2-84e9-4739-9da0-74be2af95159', 'status': 'revoked', 'revoked_at': '2026-09-02T17:29:58.504394Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:29:58.504394+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 23 ===
+  consent_id = 0e74ec2f-50aa-4155-8d6b-435034efe385
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '0e74ec2f-50aa-4155-8d6b-435034efe385', 'status': 'revoked', 'revoked_at': '2026-09-02T17:30:03.790900Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:30:03.790900+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 24 ===
+  consent_id = ef5975c4-cba4-434d-b178-04e10cbf42f5
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'ef5975c4-cba4-434d-b178-04e10cbf42f5', 'status': 'revoked', 'revoked_at': '2026-09-02T17:30:08.738425Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:30:08.738425+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 25 ===
+  consent_id = 9e66c0f6-c430-4322-bf79-0ebc5c954119
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '9e66c0f6-c430-4322-bf79-0ebc5c954119', 'status': 'revoked', 'revoked_at': '2026-09-02T17:30:13.238848Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:30:13.238848+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 26 ===
+  consent_id = 98cc494f-b481-4930-9de0-af9358f09fed
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '98cc494f-b481-4930-9de0-af9358f09fed', 'status': 'revoked', 'revoked_at': '2026-09-02T17:30:17.931449Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:30:17.931449+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 27 ===
+  consent_id = 123c2697-cde9-4ad8-862e-e8df296f1972
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '123c2697-cde9-4ad8-862e-e8df296f1972', 'status': 'revoked', 'revoked_at': '2026-09-02T17:30:22.455628Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:30:22.455628+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 28 ===
+  consent_id = bbfc784a-a761-4d78-ae7b-0a7d0f1db6f9
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'bbfc784a-a761-4d78-ae7b-0a7d0f1db6f9', 'status': 'revoked', 'revoked_at': '2026-09-02T17:30:27.675276Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:30:27.675276+00:00.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 29 ===
+  consent_id = a82c0606-9221-4e87-b08e-7dab877d523f
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'a82c0606-9221-4e87-b08e-7dab877d523f', 'status': 'revoked', 'revoked_at': '2026-09-02T17:30:29.773121Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:30:29.773121+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 30 ===
+  consent_id = 55476180-ab4b-4ec4-8186-54005c3fdc6f
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '55476180-ab4b-4ec4-8186-54005c3fdc6f', 'status': 'revoked', 'revoked_at': '2026-09-02T17:30:34.470881Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:30:34.470881+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 31 ===
+  consent_id = ecffc69f-7792-4472-8486-e45331ba2a42
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'ecffc69f-7792-4472-8486-e45331ba2a42', 'status': 'revoked', 'revoked_at': '2026-09-02T17:30:39.771874Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:30:39.771874+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 32 ===
+  consent_id = aa0bd8ae-75c7-4297-9d16-7b02b288dfc9
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'aa0bd8ae-75c7-4297-9d16-7b02b288dfc9', 'status': 'revoked', 'revoked_at': '2026-09-02T17:30:44.371932Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:30:44.371932+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 33 ===
+  consent_id = a7bf4745-4856-4d2b-819a-4d03a37afb28
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'a7bf4745-4856-4d2b-819a-4d03a37afb28', 'status': 'revoked', 'revoked_at': '2026-09-02T17:30:48.981481Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:30:48.981481+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 34 ===
+  consent_id = 0cccfe03-2bea-4000-8a14-e2bc26259bfd
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '0cccfe03-2bea-4000-8a14-e2bc26259bfd', 'status': 'revoked', 'revoked_at': '2026-09-02T17:30:54.200361Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:30:54.200361+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 35 ===
+  consent_id = b3eaaf6c-983d-47cb-b3bd-9a05e32c0a63
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'b3eaaf6c-983d-47cb-b3bd-9a05e32c0a63', 'status': 'revoked', 'revoked_at': '2026-09-02T17:30:58.636294Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:30:58.636294+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 36 ===
+  consent_id = e83c9641-940e-489a-8a0a-49a25bb5ee9f
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'e83c9641-940e-489a-8a0a-49a25bb5ee9f', 'status': 'revoked', 'revoked_at': '2026-09-02T17:31:03.357792Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:31:03.357792+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 37 ===
+  consent_id = 9c5238a0-060e-488b-af68-0c87267cc0d5
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '9c5238a0-060e-488b-af68-0c87267cc0d5', 'status': 'revoked', 'revoked_at': '2026-09-02T17:31:08.020374Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:31:08.020374+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 38 ===
+  consent_id = c529b823-0a68-4349-814e-613efe7afff1
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'c529b823-0a68-4349-814e-613efe7afff1', 'status': 'revoked', 'revoked_at': '2026-09-02T17:31:14.685249Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:31:14.685249+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 39 ===
+  consent_id = a6faee87-ea69-4a7e-97ba-c1a0158565ca
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'a6faee87-ea69-4a7e-97ba-c1a0158565ca', 'status': 'revoked', 'revoked_at': '2026-09-02T17:31:19.630703Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:31:19.630703+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 40 ===
+  consent_id = a10534f0-dcc7-4e17-b44d-b9449e649daf
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'a10534f0-dcc7-4e17-b44d-b9449e649daf', 'status': 'revoked', 'revoked_at': '2026-09-02T17:31:25.883257Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:31:25.883257+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 41 ===
+  consent_id = 40ed5fa8-75c3-4785-aac6-217cd72b7ed2
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '40ed5fa8-75c3-4785-aac6-217cd72b7ed2', 'status': 'revoked', 'revoked_at': '2026-09-02T17:31:30.780699Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:31:30.780699+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 42 ===
+  consent_id = 5ea9d8d3-3b7b-4210-9eb4-ef746ad849fe
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '5ea9d8d3-3b7b-4210-9eb4-ef746ad849fe', 'status': 'revoked', 'revoked_at': '2026-09-02T17:31:35.270074Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:31:35.270074+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 43 ===
+  consent_id = f14d4b0a-51cf-4326-bc2f-f522d83d7bbc
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'f14d4b0a-51cf-4326-bc2f-f522d83d7bbc', 'status': 'revoked', 'revoked_at': '2026-09-02T17:31:40.178041Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:31:40.178041+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 44 ===
+  consent_id = afd33083-8467-4325-b071-7ee004877404
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'afd33083-8467-4325-b071-7ee004877404', 'status': 'revoked', 'revoked_at': '2026-09-02T17:31:44.716518Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:31:44.716518+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 45 ===
+  consent_id = 9fa365db-1337-4b7d-8fbf-6ad4b391f1d8
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '9fa365db-1337-4b7d-8fbf-6ad4b391f1d8', 'status': 'revoked', 'revoked_at': '2026-09-02T17:31:49.616269Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:31:49.616269+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 46 ===
+  consent_id = b6824491-970b-495b-89a2-e04a96372b92
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'b6824491-970b-495b-89a2-e04a96372b92', 'status': 'revoked', 'revoked_at': '2026-09-02T17:31:54.142420Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:31:54.142420+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 47 ===
+  consent_id = fda40c1a-d2d4-41e6-9f87-093687209e02
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'fda40c1a-d2d4-41e6-9f87-093687209e02', 'status': 'revoked', 'revoked_at': '2026-09-02T17:31:58.642336Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:31:58.642336+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 48 ===
+  consent_id = 5e74e6ed-3e7a-4b56-a445-92e6fc157fdd
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '5e74e6ed-3e7a-4b56-a445-92e6fc157fdd', 'status': 'revoked', 'revoked_at': '2026-09-02T17:32:03.253415Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:32:03.253415+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 49 ===
+  consent_id = d6f5a507-46a3-4d68-96d4-ade767082d40
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': 'd6f5a507-46a3-4d68-96d4-ade767082d40', 'status': 'revoked', 'revoked_at': '2026-09-02T17:32:07.754743Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:32:07.754743+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+=== Revocation demo — run 50 ===
+  consent_id = 7ca88828-85c9-48a0-9a91-ab82be25aadb
+  revoking consent 1.0s into the delayed execute call...
+  revoke response: {'consent_id': '7ca88828-85c9-48a0-9a91-ab82be25aadb', 'status': 'revoked', 'revoked_at': '2026-09-02T17:32:12.753418Z'}
+  execute response: {'transaction_id': None, 'status': 'denied', 'razorpay_order_id': None, 'razorpay_payment_id': None, 'amount': None, 'reason': 'revoked_mid_transaction', 'reasoning': 'Denied: revoked_mid_transaction.', 'consent_remaining': None}
+  --- audit trail ---
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [consent_check] Approved: ₹450.00 groceries purchase within ₹2000.00 limit (₹1550.00 remaining).
+    [revocation_processed] Consent revoked by user at 2026-09-02T17:32:12.753418+00:00.
+    [consent_check] Denied: the consent contract was revoked mid-transaction.
+  PASS: aborted before any Razorpay order was created.
+
+50/50 runs aborted cleanly.

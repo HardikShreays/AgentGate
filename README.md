@@ -2,11 +2,30 @@
 
 **Track 01 — AI Growth & Agentic Commerce (Razorpay AI Buildathon)**
 
-A consent-and-trust layer for agentic commerce: an AI buyer agent can only
-spend money through a scoped, expiring, tamper-evident consent contract,
-and every check and every rupee moved is logged to a deterministic,
-queryable reasoning trail — in real time, enforced live, not just checked
-once at the start.
+[![CI](https://github.com/HardikShreays/AgentGate/actions/workflows/ci.yml/badge.svg)](https://github.com/HardikShreays/AgentGate/actions/workflows/ci.yml)
+
+Three agent-payments protocols landed this year — Google's **AP2**,
+OpenAI/Stripe's **ACP**, and **x402** — and all three stop at
+authorization. A mandate gets signed, an agent gets scoped spend, the
+check happens at the door. None of them re-verify that mandate at the
+instant money actually moves, and none of them can be pulled back
+mid-transaction.
+
+**AgentGate does both, and the repo proves it with numbers.** A buyer
+agent can only spend through a scoped, expiring, tamper-evident consent
+contract; the contract is re-checked under a database row lock as late as
+physically possible before a Razorpay order is created; and a human can
+revoke it *while a transaction is in flight* and have that revocation
+land. Every check and every rupee is written to a deterministic,
+queryable audit trail — never LLM-generated prose.
+
+Measured, reproducible, on real Postgres and real Razorpay test mode:
+
+| Claim | Evidence | Result |
+|---|---|---|
+| No double-spend under concurrency |  `scripts/race_test.py --runs 250` ([log](backend/scripts/results/race_250runs.log)) | **250/250** races closed correctly |
+| Revocation lands mid-transaction |  `scripts/revocation_demo.py --runs 50` ([log](backend/scripts/results/revocation_50runs.log)) | **50/50** aborted before Razorpay was called |
+| Suite green | `pytest tests/ -q` (CI, every push) | **56 passed** |
 
 ---
 
@@ -29,9 +48,22 @@ its consent check as late as physically possible before money moves; an
 every decision; and a **live revocation demo** that proves the bound is
 enforced *during* a transaction, not just checked at the door.
 
-Everything else — multi-merchant catalogs, negotiation, velocity limiting,
-circuit breakers — is real, interesting, and deliberately out of scope.
-See [Future Work](#7-future-work).
+### What this deliberately does not do
+
+**There is no authentication.** Every endpoint is open: any caller can
+create a consent, spend against one, or revoke one. This is the biggest
+hole in the system and it is a scoping decision, not an oversight. The
+threat model here is *"the agent overspends, or keeps spending after the
+human says stop"* — bounding and revoking a known agent's authority. It is
+not *"an attacker forges a consent or revokes someone else's."* In
+production the consent-issuing and revoking endpoints belong behind the
+human's authenticated session and `execute` behind an agent credential
+scoped to one consent. Bolting a token check on here would have blurred
+which guarantees are actually *enforced* (the row lock, the integrity
+hash, the audit trail) versus merely asserted.
+
+Also out of scope, with reasons, in [Future Work](#10-future-work):
+multi-merchant catalogs, negotiation, velocity limiting, circuit breakers.
 
 ---
 
@@ -469,7 +501,7 @@ pip install -r requirements.txt --break-system-packages
 python -m pytest tests/ -v
 ```
 
-51 tests across `test_audit.py`, `test_executor.py`, `test_webhooks.py`,
+56 tests across `test_audit.py`, `test_executor.py`, `test_webhooks.py`,
 `test_failure_path.py`, `test_revocation.py`, `test_agent.py`,
 `test_catalog.py`, and `test_demo_mode.py`. The `mock_razorpay` fixture in
 `tests/conftest.py` patches exactly the network boundary
@@ -499,12 +531,19 @@ remaining.
 Requires runtime demo mode off. In the dashboard, open
 `/demo/race` and click **Switch demo mode off** if needed.
 ```bash
-python backend/scripts/race_test.py --base-url http://localhost:8000
+python backend/scripts/race_test.py --base-url http://localhost:8000 --runs 250
 ```
 Fires two concurrent `execute_transaction` requests that together exceed
 remaining balance; asserts exactly one is accepted, one is denied with
 `insufficient_remaining_balance`, and `race_condition_detected` is logged.
-Runs 3x by default.
+
+**Measured: 250/250 races closed correctly** — 250 fresh consent
+contracts, 500 concurrent requests, 250 accepted, 250 denied with
+`insufficient_remaining_balance`, zero double-spends. Run against
+PostgreSQL 17 and live Razorpay test mode; `--runs` defaults to 3 for a
+quick check. This number is only meaningful on Postgres — SQLite ignores
+`SELECT ... FOR UPDATE`, so the row lock the test exercises does not
+exist there.
 
 ### Failure path
 Force a real failure in Razorpay's test-mode checkout by choosing
@@ -532,15 +571,19 @@ Requires runtime demo mode on. In the dashboard, open
 running it. This toggles the API process at runtime; no backend restart
 is required.
 ```bash
-python backend/scripts/revocation_demo.py --base-url http://localhost:8000 --runs 3
+python backend/scripts/revocation_demo.py --base-url http://localhost:8000 --runs 50
 ```
 Kicks off `execute_transaction` with `simulate_delay_ms=3000` on a
 background thread; 1 second in, revokes the same consent from a second,
 genuinely separate HTTP request; the executor's post-delay re-check sees
 `revoked_mid_transaction` and aborts *before* calling Razorpay. Audit
 trail shows `consent_check` (approved) → `revocation_processed` →
-`consent_check` (denied) → no `order_created` row. Runs 3x by default to
-rule out a timing fluke.
+`consent_check` (denied) → no `order_created` row.
+
+**Measured: 50/50 runs aborted before Razorpay was called** — every run
+denied with `revoked_mid_transaction`, no `order_created` audit row in any
+of them. `--runs` defaults to 3; 50 rules out a timing fluke rather than
+merely suggesting it.
 
 **Remember:** switch demo mode off before running the race-condition test
 or recording the happy-path/failure-path parts of the pitch video —
@@ -565,17 +608,9 @@ things above:
 - **A real NPCI UAP / MCP transport implementation** — see the protocol
   narrative above; the data model is shaped to make this a mapping
   exercise later, not attempted here.
-- **Authentication / authorization** — deliberately none. Every endpoint is
-  open: any caller can create a consent, execute against one, or revoke
-  one. The threat model this build addresses is *"the agent overspends or
-  keeps spending after the human says stop"* — bounding and revoking a
-  known agent's authority — not *"an attacker forges a consent or revokes
-  someone else's."* A production deployment would put the consent-issuing
-  and revoking endpoints behind the human's authenticated session and the
-  execute endpoint behind an agent credential scoped to one consent. That's
-  a real access-control layer, not a buildathon-week addition, and folding
-  a fake one in would have obscured which guarantees are actually enforced
-  here (the row lock, the integrity hash, the audit trail) versus assumed.
+- **Authentication / authorization** — deliberately none; this is the
+  system's biggest hole and it is called out up front, in
+  [What this deliberately does not do](#what-this-deliberately-does-not-do).
 
 ---
 
