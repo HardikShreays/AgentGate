@@ -79,9 +79,16 @@ def mock_razorpay():
             "status": "created",
         }
 
+    # The reservation sweep asks Razorpay whether a stale order was actually
+    # paid before expiring it. With no live Razorpay, default that lookup to
+    # "abandoned" so the sweep's expiry mechanics stay testable; the
+    # reconciliation tests patch this to "captured" / "unknown" explicitly.
+    def fake_reconcile(db, txn):
+        return "abandoned"
+
     with patch("app.executor.get_client", return_value=MagicMock()), patch(
         "app.executor.create_order", side_effect=fake_create_order
-    ), patch("app.failure.get_client", return_value=MagicMock()), patch(
-        "app.failure.create_order", side_effect=fake_create_order
-    ):
+    ), patch("app.executor.reconcile_pending_order", side_effect=fake_reconcile), patch(
+        "app.failure.get_client", return_value=MagicMock()
+    ), patch("app.failure.create_order", side_effect=fake_create_order):
         yield

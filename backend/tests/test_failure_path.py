@@ -211,6 +211,27 @@ def test_transaction_status_endpoint_returns_full_attempt_timeline(db, consent_c
         app.dependency_overrides.clear()
 
 
+def test_transaction_status_endpoint_sweeps_a_stale_pending_row(db, consent_contract, mock_razorpay):
+    """The tx status page polls `pending` forever; hitting the endpoint must
+    run the reservation sweep so a long-pending row actually resolves."""
+    from datetime import datetime, timedelta, timezone
+
+    resp = _make_order_via_executor(db, consent_contract, mock_razorpay, "stale-status-key")
+    txn = db.get(Transaction, resp.transaction_id)
+    txn.created_at = datetime.now(timezone.utc) - timedelta(seconds=get_settings().RESERVATION_TTL_SECONDS + 60)
+    db.add(txn)
+    db.commit()
+
+    _override_db(db)
+    try:
+        with TestClient(app, raise_server_exceptions=True) as client:
+            r = client.get(f"/transaction/{resp.transaction_id}/status")
+            assert r.status_code == 200
+            assert r.json()["status"] == "expired"  # mock_razorpay reconciles as "abandoned"
+    finally:
+        app.dependency_overrides.clear()
+
+
 def test_transaction_status_endpoint_404_for_unknown_transaction(db):
     _override_db(db)
     try:

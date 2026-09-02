@@ -64,11 +64,18 @@ async def razorpay_webhook(request: Request, db: Session = Depends(get_db)):
 
 
 def _handle_captured(db: Session, txn: Transaction, payment_id: str):
-    if txn.status in (TransactionStatus.captured, TransactionStatus.failed, TransactionStatus.expired):
-        # Idempotent / terminal: a retried webhook, or a late capture for a
-        # transaction the reservation sweep already expired (Task 2) — never
-        # reopen it or double-count spend_used.
+    if txn.status in (TransactionStatus.captured, TransactionStatus.failed):
+        # Idempotent / terminal on Razorpay's own verdict — a retried
+        # webhook, or a hard-failed transaction — never reopen or
+        # double-count spend_used.
         return
+
+    # An `expired` row here means the reservation sweep guessed "abandoned"
+    # but the payment actually went through (late webhook, or the sweep's
+    # own reconciliation call). Accepting it is both correct — the money
+    # left the human's account, so spend_used MUST advance — and safe: the
+    # hold was already released, so the max(0, ...) below clamps cleanly.
+    was_expired = txn.status == TransactionStatus.expired
 
     contract = db.get(ConsentContract, txn.consent_id)
     txn.status = TransactionStatus.captured
@@ -111,6 +118,10 @@ def _handle_captured(db: Session, txn: Transaction, payment_id: str):
             "razorpay_payment_id": payment_id,
             "amount": float(txn.amount),
             "attempt": txn.attempt_count,
+            # Trail must show this capture landed on a row the sweep had
+            # already written off — otherwise the reservation_released row
+            # above it reads as the final word.
+            **({"reconciled_from": "expired"} if was_expired else {}),
         },
     )
 

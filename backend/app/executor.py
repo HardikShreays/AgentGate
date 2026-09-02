@@ -28,7 +28,7 @@ from app.audit import log_action
 from app.config import get_settings
 from app.consent import check_consent
 from app.models import ActionType, ConsentContract, Transaction, TransactionStatus, _now
-from app.razorpay_client import create_order, get_client
+from app.razorpay_client import create_order, fetch_order_settlement, get_client
 from app.schemas import ExecuteTransactionResponse, TransactionStatusResponse
 
 settings = get_settings()
@@ -63,6 +63,35 @@ def _isoformat_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def reconcile_pending_order(db: Session, txn: Transaction) -> str:
+    """Ask Razorpay the truth about a long-pending transaction before the
+    sweep assumes its checkout was abandoned.
+
+    Returns:
+      "captured"  — Razorpay says paid; the transaction has been settled
+                    here (spend_used advanced, hold released, audit row).
+      "abandoned" — Razorpay says the order was never paid; safe to expire.
+      "unknown"   — no order id, or Razorpay was unreachable; leave the
+                    transaction pending and try again on the next sweep.
+
+    Split out (and patched wholesale by the mock_razorpay fixture) so the
+    sweep's expiry mechanics can be tested without a live Razorpay.
+    """
+    if not txn.razorpay_order_id:
+        return "unknown"
+    try:
+        order_status, payment_id = fetch_order_settlement(get_client(), txn.razorpay_order_id)
+    except Exception:
+        return "unknown"
+
+    if order_status == "paid" and payment_id:
+        from app.webhooks import _handle_captured
+
+        _handle_captured(db, txn, payment_id)
+        return "captured"
+    return "abandoned"
+
+
 def release_stale_reservations(db: Session, consent_id: str) -> Decimal:
     """Return budget held by transactions whose checkout was abandoned.
 
@@ -71,9 +100,14 @@ def release_stale_reservations(db: Session, consent_id: str) -> Decimal:
     webhook ever arrives, so without this sweep the hold is permanent and
     the consent slowly exhausts itself without a rupee moving.
 
-    Called lazily from execute() and GET /consent/{id} rather than from a
-    scheduler — the only moments the stale value can actually mislead
-    anyone are the next spend decision and the next dashboard read.
+    Before expiring a stale row this asks Razorpay whether the order was
+    actually paid (reconcile_pending_order) — a genuinely-paid order is
+    settled, not expired; an unreachable Razorpay leaves the row pending.
+
+    Called lazily from execute(), GET /consent/{id} and
+    GET /transaction/{id}/status rather than from a scheduler — the moments
+    the stale value can actually mislead anyone are the next spend
+    decision and the next time someone looks at the row.
 
     # ponytail: linear scan of one consent's pending rows. Fine at demo
     # scale; add an index on (consent_id, status) if this ever runs against
@@ -99,6 +133,12 @@ def release_stale_reservations(db: Session, consent_id: str) -> Decimal:
             # consent.check_consent's expiry handling).
             created = created.replace(tzinfo=timezone.utc)
         if now - created < ttl:
+            continue
+
+        outcome = reconcile_pending_order(db, txn)
+        if outcome != "abandoned":
+            # "captured": already settled by reconcile_pending_order.
+            # "unknown": Razorpay unreachable — never expire on a guess.
             continue
 
         contract = db.get(ConsentContract, txn.consent_id)

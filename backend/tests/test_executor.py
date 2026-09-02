@@ -128,6 +128,57 @@ def test_abandoned_checkout_reservation_is_released_after_ttl(db, consent_contra
     assert any(e.action_type == ActionType.reservation_released for e in trail.entries)
 
 
+def test_sweep_settles_a_paid_order_instead_of_expiring_it(db, consent_contract, mock_razorpay):
+    """Razorpay says the stale order was actually paid — the sweep must
+    capture it, not expire it (the local no-webhook-tunnel case)."""
+    from unittest.mock import patch
+    from app.webhooks import _handle_captured
+
+    executor = TransactionExecutor(db)
+    executor.execute(
+        consent_id=consent_contract.consent_id,
+        amount=Decimal("450.00"),
+        sku_category="groceries",
+        idempotency_key="paid-1",
+    )
+    _backdate(db, "paid-1", get_settings().RESERVATION_TTL_SECONDS + 60)
+
+    def reconcile_as_paid(db_, txn):
+        _handle_captured(db_, txn, "pay_RECONCILED")
+        return "captured"
+
+    with patch("app.executor.reconcile_pending_order", side_effect=reconcile_as_paid):
+        released = release_stale_reservations(db, consent_contract.consent_id)
+
+    assert released == Decimal("0")  # nothing to release — it was captured
+    txn = db.query(Transaction).filter(Transaction.idempotency_key == "paid-1").one()
+    assert txn.status == TransactionStatus.captured
+    db.refresh(consent_contract)
+    assert consent_contract.spend_used == Decimal("450.00")
+
+
+def test_sweep_leaves_row_pending_when_razorpay_is_unreachable(db, consent_contract, mock_razorpay):
+    from unittest.mock import patch
+
+    executor = TransactionExecutor(db)
+    executor.execute(
+        consent_id=consent_contract.consent_id,
+        amount=Decimal("450.00"),
+        sku_category="groceries",
+        idempotency_key="unreachable-1",
+    )
+    _backdate(db, "unreachable-1", get_settings().RESERVATION_TTL_SECONDS + 60)
+
+    with patch("app.executor.reconcile_pending_order", side_effect=lambda db_, txn: "unknown"):
+        released = release_stale_reservations(db, consent_contract.consent_id)
+
+    assert released == Decimal("0")
+    txn = db.query(Transaction).filter(Transaction.idempotency_key == "unreachable-1").one()
+    assert txn.status == TransactionStatus.pending  # never expire on a guess
+    db.refresh(consent_contract)
+    assert consent_contract.spend_reserved == Decimal("450.00")  # hold kept
+
+
 def test_fresh_reservation_is_not_swept(db, consent_contract, mock_razorpay):
     executor = TransactionExecutor(db)
     executor.execute(
@@ -176,7 +227,10 @@ def test_stale_sweep_frees_budget_for_a_later_transaction(db, consent_contract, 
     assert allowed.status == "pending"
 
 
-def test_late_webhook_for_expired_transaction_does_not_double_count(db, consent_contract, mock_razorpay):
+def test_late_capture_on_expired_transaction_is_reconciled_not_dropped(db, consent_contract, mock_razorpay):
+    """A payment that landed after the sweep expired the row must still
+    advance spend_used — the money left the human's account, so the trail
+    cannot say otherwise. The already-released hold means no double-count."""
     from app.webhooks import _handle_captured
 
     executor = TransactionExecutor(db)
@@ -190,11 +244,19 @@ def test_late_webhook_for_expired_transaction_does_not_double_count(db, consent_
     release_stale_reservations(db, consent_contract.consent_id)
 
     txn = db.query(Transaction).filter(Transaction.idempotency_key == "late-webhook-1").one()
-    _handle_captured(db, txn, "pay_LATE")
+    assert txn.status == TransactionStatus.expired  # sweep wrote it off
+
+    _handle_captured(db, txn, "pay_LATE")  # ...then the real payment shows up
 
     db.refresh(consent_contract)
-    assert consent_contract.spend_used == Decimal("0")
-    assert txn.status == TransactionStatus.expired
+    db.refresh(txn)
+    assert txn.status == TransactionStatus.captured
+    assert consent_contract.spend_used == Decimal("450.00")
+    assert consent_contract.spend_reserved == Decimal("0")  # not driven negative
+
+    trail = audit_svc.get_audit_trail(db, consent_contract.consent_id)
+    captured = [e for e in trail.entries if e.action_type == ActionType.payment_captured]
+    assert captured and captured[-1].structured_payload.get("reconciled_from") == "expired"
 
 
 # --- Task 3: spend_reserved is exposed and consistent ----------------------

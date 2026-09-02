@@ -240,7 +240,17 @@ def get_transaction_status(transaction_id: str, db: Session = Depends(get_db)):
     attempt, any bounded retry, and the final outcome. This is what the
     dashboard's Transaction Timeline page (Phase 6) reads; it does not
     need to reverse-engineer a transaction's story out of the
-    consent-scoped audit trail at GET /audit/{consent_id}."""
+    consent-scoped audit trail at GET /audit/{consent_id}.
+
+    Sweeps stale reservations for this transaction's consent first — this
+    is the page a user actually sits and watches, so it must be able to
+    resolve a long-pending row (reconcile with Razorpay, then capture or
+    expire) rather than polling `pending` forever."""
+    txn = db.get(Transaction, transaction_id)
+    if txn is None:
+        raise HTTPException(status_code=404, detail="transaction not found")
+    release_stale_reservations(db, str(txn.consent_id))
+
     status = get_transaction_status_svc(db, transaction_id)
     if status is None:
         raise HTTPException(status_code=404, detail="transaction not found")

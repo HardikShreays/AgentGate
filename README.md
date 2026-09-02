@@ -121,9 +121,19 @@ The rubric asks for this directly. The non-trivial ones:
   mid-transaction revocation.
 - **Abandoned checkouts leaked budget.** A closed Razorpay modal produces no
   webhook, so the `spend_reserved` hold was permanent. Added a lazy sweep
-  (`executor.release_stale_reservations`) that runs on the next execute and
-  the next dashboard read — no scheduler — and expires holds past
-  `RESERVATION_TTL_SECONDS`.
+  (`executor.release_stale_reservations`) that runs on the next execute, the
+  next dashboard read, and any read of `GET /transaction/{id}/status` — no
+  scheduler — and expires holds past `RESERVATION_TTL_SECONDS`.
+- **The sweep couldn't tell "abandoned" from "paid, webhook never arrived."**
+  Locally there is no webhook tunnel, so a genuinely-paid order would always
+  be expired. The sweep now calls `order.fetch` on Razorpay before writing a
+  row off (`reconcile_pending_order`): `paid` → capture it, not-paid →
+  expire, Razorpay unreachable → leave it pending and retry next sweep. And
+  a capture (webhook or reconciliation) that lands on an already-`expired`
+  row is now accepted — `spend_used` still advances, with a
+  `reconciled_from: expired` marker in the audit row — instead of being
+  silently dropped, which would have left the trail claiming ₹0 spent on a
+  payment that actually cleared.
 - **`Transaction.attempts` was referenced before it was declared.** The
   column was used throughout `failure.py` / `webhooks.py` but never added to
   the model; `attempt_count` (an int) was being mutated in its place, which
@@ -206,7 +216,9 @@ Denied response shape:
 `GET /transaction/{id}/status` — full per-attempt timeline (original
 attempt, any bounded retry, final outcome), independent of the
 consent-scoped audit trail; this is what the dashboard's Transaction
-Timeline page reads directly.
+Timeline page reads directly. Also runs the reservation sweep for this
+transaction's consent, so a row a user is watching resolves (reconcile
+with Razorpay → capture or expire) instead of polling `pending` forever.
 
 `POST /webhooks/razorpay` — `payment.captured` / `payment.failed`, HMAC
 signature verified via the pinned SDK's

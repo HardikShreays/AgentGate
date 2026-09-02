@@ -41,6 +41,27 @@ def create_order(client: razorpay.Client, amount: Decimal, receipt: str) -> dict
     )
 
 
+def fetch_order_settlement(client: razorpay.Client, order_id: str) -> tuple[str, str | None]:
+    """Ask Razorpay the current truth about an order: returns
+    (order_status, captured_payment_id_or_None).
+
+    Used by the reservation sweep to reconcile a long-pending transaction
+    before assuming the checkout was abandoned — locally there is no webhook
+    tunnel, so a genuinely-paid order would otherwise always be expired.
+    Raises on a network / auth error; the caller treats that as "unknown"
+    and leaves the transaction pending rather than expiring it.
+    """
+    order = client.order.fetch(order_id)
+    status = order.get("status", "unknown")
+    if status != "paid":
+        return status, None
+    for payment in client.order.payments(order_id).get("items", []):
+        if payment.get("status") == "captured":
+            return status, payment.get("id")
+    # Order says paid but no captured payment line — treat as not-yet-settled.
+    return status, None
+
+
 def verify_webhook_signature(client: razorpay.Client, payload_body: str, signature: str) -> bool:
     """Raises razorpay.errors.SignatureVerificationError on mismatch —
     callers should catch it and treat as a hard reject + integrity-style

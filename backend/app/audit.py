@@ -59,10 +59,13 @@ def _tmpl_order_created(p: dict) -> str:
 
 
 def _tmpl_payment_captured(p: dict) -> str:
-    return (
+    base = (
         f"Payment {p.get('razorpay_payment_id', '?')} captured for "
         f"{_money(p.get('amount'))} against order {p.get('razorpay_order_id', '?')}."
     )
+    if p.get("reconciled_from") == "expired":
+        return base + " Reconciled: this transaction had been expired as abandoned, but Razorpay confirmed the payment did go through."
+    return base
 
 
 def _tmpl_payment_failed(p: dict) -> str:
