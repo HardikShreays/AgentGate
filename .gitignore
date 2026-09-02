@@ -13,3 +13,4 @@ PITCH_SCRIPT.md
 FIX_PLAN.md
 venv/
 .venv/
+.DS_Store
