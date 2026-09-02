@@ -403,11 +403,20 @@ docker compose up --build
 dev volume — this is a demo build, not a hot-reload dev setup.
 
 **Schema note:** `init_db()` runs `Base.metadata.create_all()`, which
-creates missing *tables* but never adds *columns* to an existing one. If
-you are upgrading a checkout from before the catalog work, run
-`docker compose down -v` (or delete `backend/agentgate.db` for local
-SQLite) so the `transactions.sku` and `consent_contracts.spend_reserved`
-columns are created.
+creates missing *tables* but never adds a *column* or a Postgres *enum
+value* to something that already exists. If you are upgrading a database
+with data you want to keep, run the forward-only migration runner:
+
+```bash
+cd backend && python -m scripts.migrate   # .env pointing at the DB
+```
+
+It is idempotent (`ADD COLUMN IF NOT EXISTS` / `ADD VALUE IF NOT EXISTS`)
+and currently covers `transactions.sku`, `consent_contracts.spend_reserved`,
+`transactionstatus.expired`, and `actiontype.reservation_released`. If you
+don't care about the data, `docker compose down -v` (or deleting
+`backend/agentgate.db` for local SQLite) and letting `create_all()` rebuild
+from scratch is simpler.
 
 ### Local dev (without Docker)
 
