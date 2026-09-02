@@ -4,9 +4,11 @@ import { formatInr, relativeExpiry } from "./format";
 export function summarizeConsent(c: ConsentResponse): string {
   const limit = formatInr(c.spend_limit);
   const used = formatInr(c.spend_used);
+  const reserved = parseFloat(c.spend_reserved ?? "0");
   const remaining = formatInr(
-    (parseFloat(c.spend_limit) - parseFloat(c.spend_used)).toFixed(2)
+    (parseFloat(c.spend_limit) - parseFloat(c.spend_used) - reserved).toFixed(2)
   );
+  const reservedClause = reserved > 0 ? ` ${formatInr(reserved.toFixed(2))} in flight.` : "";
   const perTxn = formatInr(c.per_txn_max);
   const scope = c.scope.join(", ");
   const expiry = relativeExpiry(c.expiry);
@@ -24,7 +26,7 @@ export function summarizeConsent(c: ConsentResponse): string {
 
   return (
     `${c.user_id} may spend up to ${limit} at ${c.merchant_id} on ${scope}, ` +
-    `capped at ${perTxn} per transaction. ${used} used, ${remaining} remaining. ` +
+    `capped at ${perTxn} per transaction. ${used} used, ${remaining} remaining.${reservedClause} ` +
     `Status: ${c.status} (${statusClause[c.status]}). ${integrityClause}.`
   );
 }

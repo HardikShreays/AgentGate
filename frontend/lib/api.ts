@@ -6,10 +6,12 @@ import {
   ConsentCreateRequest,
   ConsentResponse,
   ConsentRevokeResponse,
+  CatalogResponse,
   ConfirmPaymentRequest,
   DemoModeResponse,
   ExecuteTransactionRequest,
   ExecuteTransactionResponse,
+  SimulateFailureRequest,
   TransactionStatusResponse,
 } from "./types";
 
@@ -66,6 +68,15 @@ export function executeTransaction(
   body: ExecuteTransactionRequest
 ): Promise<ExecuteTransactionResponse> {
   return request(`/transaction/execute`, { method: "POST", body: JSON.stringify(body) });
+}
+
+export function getCatalog(category?: string): Promise<CatalogResponse> {
+  const q = category ? `?category=${encodeURIComponent(category)}` : "";
+  return request(`/catalog${q}`);
+}
+
+export function simulateFailure(body: SimulateFailureRequest): Promise<TransactionStatusResponse> {
+  return request(`/demo/simulate-failure`, { method: "POST", body: JSON.stringify(body) });
 }
 
 export function confirmPayment(body: ConfirmPaymentRequest): Promise<TransactionStatusResponse> {

@@ -133,7 +133,7 @@ export default function RevocationDemoPage() {
     <div className="mx-auto max-w-4xl px-8 py-8">
       <div className="mb-6">
         <div className="text-[11px] font-medium uppercase tracking-label text-faint">
-          Pitch script · 3:30–4:15
+          Pitch script · 3:40–4:30
         </div>
         <h1 className="mt-1 text-xl font-semibold text-navy">Live revocation-mid-transaction demo</h1>
         <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted">

@@ -95,6 +95,7 @@ export default function ConsentInspectorPage() {
 function Loaded({ consent }: { consent: ConsentResponse }) {
   const spendLimit = parseFloat(consent.spend_limit);
   const spendUsed = parseFloat(consent.spend_used);
+  const spendReserved = parseFloat(consent.spend_reserved ?? "0");
   const expiry = relativeExpiry(consent.expiry);
 
   return (
@@ -122,7 +123,12 @@ function Loaded({ consent }: { consent: ConsentResponse }) {
         <StatCard label="Merchant" value={consent.merchant_id} />
       </div>
 
-      <SpendMeter used={spendUsed} limit={spendLimit} remaining={spendLimit - spendUsed} />
+      <SpendMeter
+        used={spendUsed}
+        limit={spendLimit}
+        reserved={spendReserved}
+        remaining={spendLimit - spendUsed - spendReserved}
+      />
 
       <ExecuteTransactionPanel consentId={consent.consent_id} defaultSkuCategory={consent.scope[0]} />
 

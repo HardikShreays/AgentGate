@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { confirmPayment, executeTransaction, getTransactionStatus } from "@/lib/api";
-import { ApiError, ExecuteTransactionResponse, TransactionStatusResponse } from "@/lib/types";
+import { confirmPayment, executeTransaction, getCatalog, getTransactionStatus } from "@/lib/api";
+import { ApiError, ExecuteTransactionResponse, Product, TransactionStatusResponse } from "@/lib/types";
 import { formatInr } from "@/lib/format";
 import { TransactionStatusCard } from "@/components/TransactionStatusStepper";
 import { CopyButton } from "@/components/CopyButton";
@@ -35,6 +35,10 @@ export function ExecuteTransactionPanel({
 }) {
   const [amount, setAmount] = useState("450");
   const [skuCategory, setSkuCategory] = useState(defaultSkuCategory);
+  // Task 1 — when a catalog product is picked, `sku` drives the request and
+  // the server prices it; amount/category go read-only. "" = custom amount.
+  const [products, setProducts] = useState<Product[]>([]);
+  const [sku, setSku] = useState("");
   const [idempotencyKey, setIdempotencyKey] = useState("");
   const [simulateDelayMs, setSimulateDelayMs] = useState("0");
   const [advancedOpen, setAdvancedOpen] = useState(false);
@@ -50,10 +54,20 @@ export function ExecuteTransactionPanel({
 
   useEffect(() => {
     setIdempotencyKey(newIdempotencyKey());
+    getCatalog().then((c) => setProducts(c.products)).catch(() => {});
     return () => {
       if (pollTimer.current) clearTimeout(pollTimer.current);
     };
   }, []);
+
+  function selectSku(nextSku: string) {
+    setSku(nextSku);
+    const product = products.find((p) => p.sku === nextSku);
+    if (product) {
+      setAmount(product.price);
+      setSkuCategory(product.category);
+    }
+  }
 
   function resetResultState() {
     setResult(null);
@@ -69,8 +83,9 @@ export function ExecuteTransactionPanel({
     try {
       const res = await executeTransaction({
         consent_id: consentId,
-        amount,
-        sku_category: skuCategory.trim(),
+        ...(sku
+          ? { sku }
+          : { amount, sku_category: skuCategory.trim() }),
         idempotency_key: idempotencyKey,
         simulate_delay_ms: parseInt(simulateDelayMs, 10) || 0,
       });
@@ -178,16 +193,38 @@ export function ExecuteTransactionPanel({
       </div>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-3">
+        {products.length > 0 && (
+          <label className="col-span-2 block">
+            <span className="block text-[11px] font-medium uppercase tracking-label text-faint">
+              Product (catalog — server prices it)
+            </span>
+            <select
+              value={sku}
+              onChange={(e) => selectSku(e.target.value)}
+              className="mt-1.5 w-full rounded-sm border border-border bg-surfaceMuted px-2.5 py-2 text-sm text-navy focus:border-brand focus:bg-surface"
+            >
+              <option value="">Custom amount…</option>
+              {products.map((p) => (
+                <option key={p.sku} value={p.sku}>
+                  {p.name} — ₹{p.price} ({p.category})
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <label className="block">
           <span className="block text-[11px] font-medium uppercase tracking-label text-faint">
-            Amount (₹)
+            Amount (₹){sku ? " — from catalog" : ""}
           </span>
           <input
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             inputMode="decimal"
             required
-            className="mt-1.5 w-full rounded-sm border border-border bg-surfaceMuted px-2.5 py-2 font-mono text-sm text-navy focus:border-brand focus:bg-surface"
+            readOnly={!!sku}
+            className={`mt-1.5 w-full rounded-sm border border-border px-2.5 py-2 font-mono text-sm text-navy focus:border-brand focus:bg-surface ${
+              sku ? "bg-surfaceSunken text-muted" : "bg-surfaceMuted"
+            }`}
           />
         </label>
         <label className="block">
@@ -198,7 +235,10 @@ export function ExecuteTransactionPanel({
             value={skuCategory}
             onChange={(e) => setSkuCategory(e.target.value)}
             required
-            className="mt-1.5 w-full rounded-sm border border-border bg-surfaceMuted px-2.5 py-2 font-mono text-sm text-navy focus:border-brand focus:bg-surface"
+            readOnly={!!sku}
+            className={`mt-1.5 w-full rounded-sm border border-border px-2.5 py-2 font-mono text-sm text-navy focus:border-brand focus:bg-surface ${
+              sku ? "bg-surfaceSunken text-muted" : "bg-surfaceMuted"
+            }`}
           />
         </label>
 
