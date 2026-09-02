@@ -156,6 +156,13 @@ export interface AgentMessageRequest {
 
 export interface AgentMessageResponse {
   response: string;
+  // Present only when the agent's run created a real Razorpay order — the
+  // chat opens Checkout to complete it, same as the dashboard execute panel.
+  consent_id?: string | null;
+  transaction_id?: string | null;
+  razorpay_order_id?: string | null;
+  status?: string | null;
+  reason?: string | null;
 }
 
 export class ApiError extends Error {
