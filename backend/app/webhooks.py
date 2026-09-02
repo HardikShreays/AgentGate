@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 from app.audit import log_action
 from app.db import get_db
 from app.failure import FailureHandler
-from app.models import ActionType, ConsentContract, Transaction, TransactionStatus, _now
+from app.models import ActionType, ConsentContract, ConsentStatus, Transaction, TransactionStatus, _now
 from app.razorpay_client import get_client, verify_webhook_signature
 
 router = APIRouter()
@@ -64,8 +64,11 @@ async def razorpay_webhook(request: Request, db: Session = Depends(get_db)):
 
 
 def _handle_captured(db: Session, txn: Transaction, payment_id: str):
-    if txn.status == TransactionStatus.captured:
-        return  # idempotent: webhook can be retried/duplicated by Razorpay
+    if txn.status in (TransactionStatus.captured, TransactionStatus.failed, TransactionStatus.expired):
+        # Idempotent / terminal: a retried webhook, or a late capture for a
+        # transaction the reservation sweep already expired (Task 2) — never
+        # reopen it or double-count spend_used.
+        return
 
     contract = db.get(ConsentContract, txn.consent_id)
     txn.status = TransactionStatus.captured
@@ -89,6 +92,11 @@ def _handle_captured(db: Session, txn: Transaction, payment_id: str):
     # out of spend_reserved and into spend_used rather than being double-
     # counted against remaining balance.
     contract.spend_reserved = max(Decimal("0"), Decimal(contract.spend_reserved or 0) - Decimal(txn.amount))
+    # Task 5 — once the limit is fully committed (spent + still held), the
+    # contract is exhausted. Makes that ConsentStatus branch reachable and
+    # the dashboard badge honest instead of stuck on "active".
+    if Decimal(contract.spend_used) + Decimal(contract.spend_reserved or 0) >= Decimal(contract.spend_limit):
+        contract.status = ConsentStatus.exhausted
     db.add(txn)
     db.add(contract)
     db.commit()
@@ -108,9 +116,9 @@ def _handle_captured(db: Session, txn: Transaction, payment_id: str):
 
 
 def _handle_failed(db: Session, txn: Transaction, error_reason: str):
-    if txn.status in (TransactionStatus.captured, TransactionStatus.failed):
-        return  # idempotent: terminal already, or a stale retry's failure
-        # arriving after a later attempt already captured — never reopen.
+    if txn.status in (TransactionStatus.captured, TransactionStatus.failed, TransactionStatus.expired):
+        return  # idempotent: terminal already (captured, hard-failed, or
+        # expired by the reservation sweep) — never reopen.
 
     # Phase 4 (FailureHandler) owns everything from here: logging this
     # attempt's failure, the bounded retry-or-finalize decision, and the

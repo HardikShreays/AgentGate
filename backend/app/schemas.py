@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional, Any
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.models import ActionType, ConsentStatus
 
@@ -24,6 +24,11 @@ class ConsentResponse(BaseModel):
     merchant_id: str
     spend_limit: Decimal
     spend_used: Decimal
+    # Held under the row lock at execute() time, settled on webhook capture or
+    # returned by the reservation sweep. Exposed (Task 3) so the dashboard's
+    # remaining-balance figure matches what check_consent actually enforces:
+    # remaining = spend_limit - spend_used - spend_reserved.
+    spend_reserved: Decimal = Decimal("0")
     per_txn_max: Decimal
     scope: list[str]
     expiry: datetime
@@ -50,14 +55,43 @@ class ConsentCheckResult(BaseModel):
     remaining: Optional[Decimal] = None
 
 
+# ---- Catalog (Task 1) ----
+
+class Product(BaseModel):
+    sku: str
+    name: str
+    category: str
+    price: Decimal
+
+
+class CatalogResponse(BaseModel):
+    merchant_id: str
+    product_count: int
+    products: list[Product]
+
+
 # ---- Transaction (A.4) ----
 
 class ExecuteTransactionRequest(BaseModel):
     consent_id: str
-    amount: Decimal
-    sku_category: str
+    # amount / sku_category are ignored when `sku` is supplied — the price and
+    # category are then resolved server-side from the catalog (Task 1). Both
+    # stay supported for the race/revocation demo scripts, which drive raw
+    # amounts against a fresh consent.
+    amount: Optional[Decimal] = None
+    sku: Optional[str] = None
+    sku_category: Optional[str] = None
     idempotency_key: str
-    simulate_delay_ms: int = 0
+    # Bounded (Task 4): DEMO_MODE-gated in the executor, and even then a caller
+    # can't hold a `SELECT ... FOR UPDATE` lock open indefinitely. 5000ms
+    # comfortably covers the revocation demo's 3000ms.
+    simulate_delay_ms: int = Field(0, ge=0, le=5000)
+
+    @model_validator(mode="after")
+    def _require_sku_or_amount(self):
+        if self.sku is None and (self.amount is None or self.sku_category is None):
+            raise ValueError("provide either sku, or both amount and sku_category")
+        return self
 
 
 class ExecuteTransactionResponse(BaseModel):
@@ -80,6 +114,11 @@ class ConfirmPaymentRequest(BaseModel):
 
 class DemoModeRequest(BaseModel):
     enabled: bool
+
+
+class SimulateFailureRequest(BaseModel):
+    transaction_id: str
+    error_reason: str = "payment_declined_by_bank"
 
 
 class DemoModeResponse(BaseModel):

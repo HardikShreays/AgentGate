@@ -27,30 +27,41 @@ export function SpendMeter({
   used,
   limit,
   remaining,
+  reserved = 0,
 }: {
   used: number;
   limit: number;
   remaining: number;
+  reserved?: number;
 }) {
-  const pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
-  const barColor = pct >= 90 ? "bg-danger" : pct >= 60 ? "bg-warning" : "bg-brand";
+  const usedPct = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
+  const reservedPct = limit > 0 ? Math.min(100 - usedPct, (reserved / limit) * 100) : 0;
+  const committedPct = usedPct + reservedPct;
+  const barColor = committedPct >= 90 ? "bg-danger" : committedPct >= 60 ? "bg-warning" : "bg-brand";
+  const inr = (n: number) => `₹${n.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`;
 
   return (
     <div className="rounded-lg border border-border bg-surface p-4 shadow-card">
       <div className="flex items-baseline justify-between">
         <span className="text-[11px] font-medium uppercase tracking-label text-faint">Spend used</span>
-        <span className="font-mono text-xs text-muted">{pct.toFixed(1)}%</span>
+        <span className="font-mono text-xs text-muted">{committedPct.toFixed(1)}%</span>
       </div>
-      <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-surfaceSunken">
-        <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
+      <div className="mt-2 flex h-2 w-full overflow-hidden rounded-full bg-surfaceSunken">
+        <div className={`h-full transition-all ${barColor}`} style={{ width: `${usedPct}%` }} />
+        {reserved > 0 && (
+          <div
+            className="h-full bg-brand/35 transition-all [background-image:repeating-linear-gradient(45deg,transparent,transparent_3px,rgba(255,255,255,0.5)_3px,rgba(255,255,255,0.5)_6px)]"
+            style={{ width: `${reservedPct}%` }}
+            title="Authorized but not yet captured"
+          />
+        )}
       </div>
       <div className="mt-2 flex items-baseline justify-between gap-3 font-mono text-xs">
-        <span className="min-w-0 truncate text-navy">
-          ₹{used.toLocaleString("en-IN", { minimumFractionDigits: 2 })} used
-        </span>
-        <span className="min-w-0 truncate text-muted">
-          ₹{remaining.toLocaleString("en-IN", { minimumFractionDigits: 2 })} remaining
-        </span>
+        <span className="min-w-0 truncate text-navy">{inr(used)} used</span>
+        {reserved > 0 && (
+          <span className="min-w-0 truncate text-muted">{inr(reserved)} in flight</span>
+        )}
+        <span className="min-w-0 truncate text-muted">{inr(remaining)} remaining</span>
       </div>
     </div>
   );

@@ -123,13 +123,18 @@ export function Sidebar() {
         </div>
         <NavLink
           href="/demo/revocation"
-          label="Revocation (3:30)"
+          label="Revocation mid-txn"
           active={pathname?.startsWith("/demo/revocation") ?? false}
         />
         <NavLink
           href="/demo/race"
           label="Race condition"
           active={pathname?.startsWith("/demo/race") ?? false}
+        />
+        <NavLink
+          href="/demo/failure"
+          label="Failure path"
+          active={pathname?.startsWith("/demo/failure") ?? false}
         />
       </nav>
 

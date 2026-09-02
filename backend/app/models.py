@@ -55,6 +55,11 @@ class TransactionStatus(str, enum.Enum):
     captured = "captured"
     denied = "denied"
     failed = "failed"
+    # Checkout was never completed and no webhook is coming — the reservation
+    # sweep (Task 2) marks the row terminal and returns its hold to the
+    # contract's balance. Distinct from `failed`, which means Razorpay
+    # reported a failure and FailureHandler ran its bounded retry.
+    expired = "expired"
 
 
 class ActionType(str, enum.Enum):
@@ -67,6 +72,7 @@ class ActionType(str, enum.Enum):
     revocation_processed = "revocation_processed"
     race_condition_detected = "race_condition_detected"
     integrity_violation = "integrity_violation"
+    reservation_released = "reservation_released"
 
 
 class ConsentContract(Base):
@@ -101,6 +107,10 @@ class Transaction(Base):
     idempotency_key = Column(String, nullable=False, unique=True)
     amount = Column(Numeric(12, 2), nullable=False)
     sku_category = Column(String, nullable=False)
+    # Set when the purchase came from the catalog (Task 1). Null for raw
+    # amount+category calls, which stay supported for the race/revocation
+    # demo scripts and the existing test suite.
+    sku = Column(String, nullable=True)
     status = Column(Enum(TransactionStatus), nullable=False, default=TransactionStatus.pending)
     razorpay_order_id = Column(String, nullable=True)
     razorpay_payment_id = Column(String, nullable=True)

@@ -18,11 +18,12 @@ Sequence (A.4), now actually implemented rather than scaffolded:
     budget.
 """
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 from sqlalchemy.orm import Session
 
+from app import catalog
 from app.audit import log_action
 from app.config import get_settings
 from app.consent import check_consent
@@ -62,6 +63,84 @@ def _isoformat_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def release_stale_reservations(db: Session, consent_id: str) -> Decimal:
+    """Return budget held by transactions whose checkout was abandoned.
+
+    spend_reserved is written under the row lock at execute() time and
+    settled only by a webhook. If the buyer closes the Razorpay modal no
+    webhook ever arrives, so without this sweep the hold is permanent and
+    the consent slowly exhausts itself without a rupee moving.
+
+    Called lazily from execute() and GET /consent/{id} rather than from a
+    scheduler — the only moments the stale value can actually mislead
+    anyone are the next spend decision and the next dashboard read.
+
+    # ponytail: linear scan of one consent's pending rows. Fine at demo
+    # scale; add an index on (consent_id, status) if this ever runs against
+    # a real transaction volume.
+    """
+    now = datetime.now(timezone.utc)
+    ttl = timedelta(seconds=settings.RESERVATION_TTL_SECONDS)
+
+    pending = (
+        db.query(Transaction)
+        .filter(Transaction.consent_id == consent_id)
+        .filter(Transaction.status == TransactionStatus.pending)
+        .all()
+    )
+
+    released_total = Decimal("0")
+    released_rows: list[Transaction] = []
+    for txn in pending:
+        created = txn.created_at
+        if created.tzinfo is None:
+            # SQLite drops tzinfo on round-trip; treat naive as UTC so the
+            # comparison is stable across SQLite and Postgres (same idiom as
+            # consent.check_consent's expiry handling).
+            created = created.replace(tzinfo=timezone.utc)
+        if now - created < ttl:
+            continue
+
+        contract = db.get(ConsentContract, txn.consent_id)
+        txn.status = TransactionStatus.expired
+        # New dicts, never in-place mutation — SQLAlchemy's change detection
+        # diffs by value and would skip the UPDATE otherwise (see the note in
+        # failure.py's _record_attempt_outcome).
+        new_attempts = []
+        for entry in txn.attempts or []:
+            entry = dict(entry)
+            if entry.get("status") == "pending":
+                entry["status"] = "expired"
+                entry["resolved_at"] = _isoformat_now()
+            new_attempts.append(entry)
+        txn.attempts = new_attempts
+        if contract is not None:
+            contract.spend_reserved = max(
+                Decimal("0"), Decimal(contract.spend_reserved or 0) - Decimal(txn.amount)
+            )
+            db.add(contract)
+        db.add(txn)
+        released_total += Decimal(txn.amount)
+        released_rows.append(txn)
+
+    if not released_rows:
+        return Decimal("0")
+
+    db.commit()
+    for txn in released_rows:
+        log_action(
+            db,
+            str(txn.consent_id),
+            ActionType.reservation_released,
+            {
+                "transaction_id": str(txn.transaction_id),
+                "amount": float(txn.amount),
+                "ttl_seconds": settings.RESERVATION_TTL_SECONDS,
+            },
+        )
+    return released_total
+
+
 class TransactionExecutor:
     def __init__(self, db: Session):
         self.db = db
@@ -70,11 +149,39 @@ class TransactionExecutor:
     def execute(
         self,
         consent_id: str,
-        amount: Decimal,
-        sku_category: str,
         idempotency_key: str,
+        amount: Decimal | None = None,
+        sku_category: str | None = None,
+        sku: str | None = None,
         simulate_delay_ms: int = 0,
     ) -> ExecuteTransactionResponse:
+        # Catalog resolution (Task 1). When a sku is supplied the price and
+        # category come from the server-side catalog, and any caller-supplied
+        # amount is DISCARDED. An agent names an item; it never sets a price.
+        if sku is not None:
+            product = catalog.get_product(sku)
+            if product is None:
+                return ExecuteTransactionResponse(
+                    transaction_id=None,
+                    status="denied",
+                    reason="unknown_sku",
+                    reasoning=f"Denied: '{sku}' is not a product in this merchant's catalog.",
+                )
+            amount = product["price"]
+            sku_category = product["category"]
+
+        if amount is None or sku_category is None:
+            return ExecuteTransactionResponse(
+                transaction_id=None,
+                status="denied",
+                reason="invalid_request",
+                reasoning="Denied: provide either a sku, or both amount and sku_category.",
+            )
+
+        # Return budget held by transactions whose checkout was abandoned
+        # (Task 2) before deciding whether this one fits.
+        release_stale_reservations(self.db, consent_id)
+
         # (1) idempotency short-circuit
         existing = (
             self.db.query(Transaction)
@@ -93,7 +200,7 @@ class TransactionExecutor:
 
         # (2) initial check_consent, outside the lock — cheap early exit
         result, contract = check_consent(self.db, consent_id, amount, sku_category)
-        self._log_check(consent_id, amount, sku_category, contract, result)
+        self._log_check(consent_id, amount, sku_category, contract, result, sku=sku)
         if not result.allowed:
             return self._denied_response(result)
 
@@ -121,7 +228,7 @@ class TransactionExecutor:
             locked_contract.spend_reserved = Decimal(locked_contract.spend_reserved or 0) + amount
             self.db.add(locked_contract)
 
-        self._log_check(consent_id, amount, sku_category, contract, result, under_lock=True)
+        self._log_check(consent_id, amount, sku_category, contract, result, under_lock=True, sku=sku)
         if not result.allowed:
             reason = result.reason
             if reason == "insufficient_remaining_balance":
@@ -139,7 +246,7 @@ class TransactionExecutor:
 
             # (6) post-delay re-check — catches revocation mid-transaction
             result, contract = check_consent(self.db, consent_id, amount, sku_category)
-            self._log_check(consent_id, amount, sku_category, contract, result, under_lock=True)
+            self._log_check(consent_id, amount, sku_category, contract, result, under_lock=True, sku=sku)
             if not result.allowed:
                 # Abandoning before an order is created — release the hold
                 # placed above so a revoked/aborted transaction doesn't
@@ -155,6 +262,7 @@ class TransactionExecutor:
             idempotency_key=idempotency_key,
             amount=amount,
             sku_category=sku_category,
+            sku=sku,
             status=TransactionStatus.pending,
             razorpay_order_id=order["id"],
             attempt_number=1,
@@ -213,11 +321,12 @@ class TransactionExecutor:
             self.db.add(contract)
             self.db.commit()
 
-    def _log_check(self, consent_id, amount, sku_category, contract, result, under_lock=False):
+    def _log_check(self, consent_id, amount, sku_category, contract, result, under_lock=False, sku=None):
         payload = {
             "decision": "approved" if result.allowed else "denied",
             "amount": float(amount),
             "sku_category": sku_category,
+            "sku": sku,
             "limit": float(contract.spend_limit) if contract else None,
             "used": float(contract.spend_used) if contract else None,
             "per_txn_max": float(contract.per_txn_max) if contract else None,

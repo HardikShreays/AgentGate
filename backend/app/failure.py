@@ -61,10 +61,11 @@ class FailureHandler:
         if txn is None:
             raise ValueError(f"transaction not found: {transaction_id}")
 
-        if txn.status in (TransactionStatus.captured, TransactionStatus.failed):
+        if txn.status in (TransactionStatus.captured, TransactionStatus.failed, TransactionStatus.expired):
             # Terminal already (e.g. a duplicate/delayed webhook delivery
-            # for an attempt we've already resolved) — nothing to do.
-            # Never re-open a terminal transaction or create another order.
+            # for an attempt we've already resolved, or a row the reservation
+            # sweep expired) — nothing to do. Never re-open a terminal
+            # transaction or create another order.
             return {"status": txn.status.value, "attempt_count": txn.attempt_count}
 
         current_attempt = txn.attempt_count

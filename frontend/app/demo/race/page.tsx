@@ -126,7 +126,7 @@ export default function RaceDemoPage() {
     <div className="mx-auto max-w-4xl px-8 py-8">
       <div className="mb-6">
         <div className="text-[11px] font-medium uppercase tracking-label text-faint">
-          Pitch script · 2:00 area / Appendix A.6
+          Pitch script · 3:00–3:40 / Appendix A.6
         </div>
         <h1 className="mt-1 text-xl font-semibold text-navy">Live race-condition demo</h1>
         <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted">

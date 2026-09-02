@@ -19,6 +19,9 @@ export interface ConsentResponse {
   merchant_id: string;
   spend_limit: string;
   spend_used: string;
+  // Authorized-but-not-yet-captured holds. remaining = limit - used - reserved,
+  // which is exactly what check_consent enforces (Task 3).
+  spend_reserved: string;
   per_txn_max: string;
   scope: string[];
   expiry: string;
@@ -63,10 +66,32 @@ export interface AuditTrailResponse {
 
 export interface ExecuteTransactionRequest {
   consent_id: string;
-  amount: string;
-  sku_category: string;
+  // amount / sku_category are ignored by the backend when `sku` is set — the
+  // price and category are resolved server-side from the catalog (Task 1).
+  amount?: string;
+  sku?: string;
+  sku_category?: string;
   idempotency_key: string;
   simulate_delay_ms?: number;
+}
+
+// Mirrors backend Product / CatalogResponse (app/schemas.py, GET /catalog).
+export interface Product {
+  sku: string;
+  name: string;
+  category: string;
+  price: string;
+}
+
+export interface CatalogResponse {
+  merchant_id: string;
+  product_count: number;
+  products: Product[];
+}
+
+export interface SimulateFailureRequest {
+  transaction_id: string;
+  error_reason?: string;
 }
 
 // Mirrors backend ExecuteTransactionResponse (app/schemas.py). Note this
