@@ -136,8 +136,9 @@ export default function Home() {
         <div className="rounded-lg border border-border bg-surface p-4 shadow-card">
           <ArchitectureDiagram />
           <p className="mt-2 text-center text-[11px] text-faint">
-            Money decisions are never made by an LLM — the agent's tools call directly into
-            the same Consent Engine and Tx Executor the HTTP API uses.
+            Neither money decisions nor prices come from the LLM — the agent picks a catalog
+            SKU, the server prices it, and the tools call straight into the same Consent
+            Engine and Tx Executor the HTTP API uses.
           </p>
         </div>
       </div>
