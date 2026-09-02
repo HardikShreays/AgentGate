@@ -136,6 +136,16 @@ The rubric asks for this directly. The non-trivial ones:
   `razorpay.utils.verify_webhook_signature`; on the pinned SDK (2.0.1) it is
   `client.utility.verify_webhook_signature`, raising
   `SignatureVerificationError`. Confirmed against the installed package.
+- **The buyer agent replayed instead of buying.** `idempotency_key` was a
+  tool parameter the LLM filled in; at `temperature=0` it produced the same
+  string every run, so every request after the first hit the executor's
+  idempotency short-circuit and returned an old transaction id with no new
+  order. Now scoped to the `run_agent()` call and hidden from the model.
+- **The agent flow dead-ended at `pending`.** `POST /agent/message`
+  returned only text, discarding the `razorpay_order_id`, so the chat UI
+  had no way to open Checkout — the transaction sat pending until the
+  reservation sweep expired it. The endpoint now returns the order/txn ids
+  and the chat opens Checkout.js exactly like the dashboard execute panel.
 
 ---
 
@@ -213,10 +223,12 @@ so the trail is both readable and queryable — never LLM-generated prose.
 ### Agent
 
 `POST /agent/message` — `{"message": "..."}` → runs the LangGraph buyer
-agent once and returns its final text response. A thin HTTP entry point
-over the same agent used by `scripts/agent_demo.py`; not part of the
-non-negotiable scope, kept intentionally minimal (no streaming, no
-session persistence).
+agent once. Returns `{response, consent_id?, transaction_id?,
+razorpay_order_id?, status?, reason?}` — the trailing fields are populated
+only when the run created a real Razorpay order, so the dashboard chat can
+open Checkout and finish the purchase instead of the flow dead-ending at
+`pending` (the reservation sweep would expire it 15 minutes later). No
+streaming, no session persistence across calls.
 
 The agent has four tools: `browse_catalog_tool` (find a SKU + price from a
 product named in words), `check_consent_tool`, `execute_transaction_tool`
@@ -224,6 +236,13 @@ product named in words), `check_consent_tool`, `execute_transaction_tool`
 a bag of rice"* is browse → check → execute → summarize, so the hard
 iteration cap is 4 (raised from 3 when the browse step was added); the 5th
 turn is forced to plain text with any sneaked-in tool calls stripped.
+
+**The idempotency key is not the model's to choose.** At `temperature=0`
+the LLM invents the same literal string on every run, so an identical
+request would silently replay the first transaction forever. `run_agent()`
+mints a UUID per invocation and the key is `{run_id}:{sku}` — a retry
+*within* one run dedups correctly, every new run genuinely transacts. The
+`execute_transaction_tool` no longer exposes `idempotency_key` at all.
 
 ### Demo triggers (DEMO_MODE only)
 
@@ -313,6 +332,11 @@ writes its own `consent_check` audit row (Phase 3's rule: if a consent
 check happened, there is a log row), independent of whatever the executor
 logs a moment later — an agent asking "is this allowed?" and the executor
 re-verifying it under a row lock are two distinct, both-real events.
+
+Neither is the **idempotency key** the model's to choose — see the note
+under the Agent API above. It is scoped to the `run_agent()` invocation, so
+identical requests across runs each transact and a retry inside one run
+replays, without the model ever seeing the key.
 
 ---
 
