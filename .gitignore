@@ -11,3 +11,5 @@ PITCH_SCRIPT.md
 *.zip
 # Working document, not part of the submission
 FIX_PLAN.md
+venv/
+.venv/
