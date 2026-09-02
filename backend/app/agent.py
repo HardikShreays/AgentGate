@@ -2,12 +2,14 @@
 Phase 5 — Buyer Agent (A.7, A.16).
 
 A single custom-built LangGraph node running a ReAct-style loop, bound to
-exactly three tools: check_consent_tool, execute_transaction_tool,
-get_status_tool. This is a hand-built StateGraph rather than
-langgraph.prebuilt.create_react_agent, because the plan's acceptance
-criteria need something the prebuilt agent doesn't expose out of the box:
-a hard, counted stop at 3 tool-calling iterations that forces a summary
-response on the would-be 4th, rather than an opaque recursion limit.
+four tools: browse_catalog_tool, check_consent_tool,
+execute_transaction_tool, get_status_tool. This is a hand-built StateGraph
+rather than langgraph.prebuilt.create_react_agent, because the plan's
+acceptance criteria need something the prebuilt agent doesn't expose out of
+the box: a hard, counted stop at MAX_ITERATIONS tool-calling iterations
+that forces a summary response on the next turn, rather than an opaque
+recursion limit. (MAX_ITERATIONS was raised from 3 to 4 when the catalog
+browse step was added — see Task 1.)
 
 The system prompt tells the model it may only act through the three
 tools — but that instruction is not the enforcement. The enforcement is
@@ -35,6 +37,7 @@ from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
 from sqlalchemy.orm import Session
 
+from app import catalog
 from app.audit import log_action
 from app.config import get_settings, VALID_SKU_CATEGORIES
 from app.consent import check_consent
@@ -43,29 +46,37 @@ from app.models import ActionType
 
 settings = get_settings()
 
-MAX_ITERATIONS = 3  # A.7 — max_iterations=3, then force a final response.
+# A.7 — hard, counted stop, then force a final response. Raised from 3 to 4
+# (Task 1) because the catalog flow is browse_catalog -> check_consent ->
+# execute_transaction, and the model needs a 4th turn to summarize the
+# outcome rather than being force-stopped on every successful purchase.
+MAX_ITERATIONS = 4
 
 SYSTEM_PROMPT = (
     "You are AgentGate's buyer agent. You act on a human's behalf to make "
     "small, pre-authorized purchases against an existing consent contract.\n\n"
-    "You may ONLY act through the three tools available to you: "
-    "check_consent_tool, execute_transaction_tool, get_status_tool. "
+    "You may ONLY act through the four tools available to you: "
+    "browse_catalog_tool, check_consent_tool, execute_transaction_tool, "
+    "get_status_tool. "
     "You never reason about spend limits, scope, expiry, or revocation "
     "yourself, and you never claim a purchase succeeded or failed unless a "
     "tool told you so — those checks are enforced by the tools, not by "
     "your judgement. If a tool returns denied/allowed=false, report that "
     "denial and its reason plainly; do not retry with a different amount "
     "or category to work around it, and do not argue with the result.\n\n"
-    "Typical flow for a purchase request: call check_consent_tool first. "
-    "If it is not allowed, stop and report the reason. If it is allowed, "
-    "call execute_transaction_tool with the same amount and category. "
-    "Then summarize the outcome for the human in one or two sentences, "
-    "including the transaction id or denial reason and the reasoning "
-    "string the tool returned."
+    "Typical flow for a purchase request: if the human names a product in "
+    "words rather than a sku, call browse_catalog_tool first to find the "
+    "matching sku and its real price. Then call check_consent_tool with that "
+    "price. If it is not allowed, stop and report the reason. If it is "
+    "allowed, call execute_transaction_tool with the sku (omit amount — the "
+    "server prices it from the catalog). Then summarize the outcome for the "
+    "human in one or two sentences, including the transaction id or denial "
+    "reason and the reasoning string the tool returned. Never state a price "
+    "that did not come from a tool result."
 )
 
 FORCE_FINAL_PROMPT = (
-    "You have used all 3 of your tool-call turns for this request. Do not "
+    "You have used all 4 of your tool-call turns for this request. Do not "
     "call any more tools. Reply now, in plain text, summarizing exactly "
     "what you attempted and what the tools returned so far. If nothing "
     "conclusive happened, say so plainly rather than guessing at an "
@@ -78,7 +89,7 @@ class AgentState(TypedDict):
     iterations: int
 
 
-def _log_agent_consent_check(db: Session, consent_id: str, amount: Decimal, sku_category: str, contract, result) -> None:
+def _log_agent_consent_check(db: Session, consent_id: str, amount: Decimal, sku_category: str, contract, result, sku: Optional[str] = None) -> None:
     """check_consent_tool performs a real consent check (Phase 3 rule:
     if a consent check happened, there is a log row) independently of
     whatever execute_transaction_tool logs later — an agent asking "is
@@ -95,6 +106,7 @@ def _log_agent_consent_check(db: Session, consent_id: str, amount: Decimal, sku_
         "per_txn_max": float(contract.per_txn_max) if contract else None,
         "remaining": float(result.remaining) if result.remaining is not None else None,
         "reason": result.reason,
+        "sku": sku,
         "source": "buyer_agent",
     }
     log_action(db, consent_id, ActionType.consent_check, payload)
@@ -103,15 +115,28 @@ def _log_agent_consent_check(db: Session, consent_id: str, amount: Decimal, sku_
 
 
 def build_tools(db: Session) -> list:
-    """A.16 — the three tools bound to the agent. Each is a thin wrapper:
+    """A.16 — the four tools bound to the agent. Each is a thin wrapper:
     no money logic lives here, only argument parsing and a call straight
     into the already-tested service layer."""
 
     @tool
-    def check_consent_tool(consent_id: str, amount: float, sku_category: str) -> dict:
+    def browse_catalog_tool(category: Optional[str] = None) -> dict:
+        """List what this merchant sells, optionally filtered to one category
+        ("groceries", "food", "electronics", "subscriptions"). Call this FIRST
+        when the human names a product in words rather than giving you a sku,
+        so you can find the matching sku and its real price. Returns
+        {"products": [{"sku", "name", "category", "price"}]}. Never invent a
+        sku or a price that did not come from this tool."""
+        products = catalog.list_products(category)
+        return {"products": [{**p, "price": float(p["price"])} for p in products]}
+
+    @tool
+    def check_consent_tool(consent_id: str, amount: float, sku_category: str, sku: Optional[str] = None) -> dict:
         """Check whether a purchase is allowed under a consent contract,
         without spending anything. Always call this before
-        execute_transaction_tool. Returns
+        execute_transaction_tool. Pass `sku` too when the purchase is a
+        catalog item, so the audit trail records which item was checked.
+        Returns
         {"allowed": bool, "reason": str | None, "remaining": float | None}.
         `reason` is only present when allowed is false, and is a stable
         machine-readable code such as "per_txn_max_exceeded",
@@ -124,7 +149,7 @@ def build_tools(db: Session) -> list:
             return {"allowed": False, "reason": "invalid_amount", "remaining": None}
 
         result, contract = check_consent(db, consent_id, decimal_amount, sku_category)
-        _log_agent_consent_check(db, consent_id, decimal_amount, sku_category, contract, result)
+        _log_agent_consent_check(db, consent_id, decimal_amount, sku_category, contract, result, sku=sku)
         return {
             "allowed": result.allowed,
             "reason": result.reason,
@@ -134,37 +159,47 @@ def build_tools(db: Session) -> list:
     @tool
     def execute_transaction_tool(
         consent_id: str,
-        amount: float,
-        sku_category: str,
         idempotency_key: str,
+        sku: Optional[str] = None,
+        amount: Optional[float] = None,
+        sku_category: Optional[str] = None,
     ) -> dict:
         """Attempt to actually execute a purchase against a consent
         contract. This is the only tool that can move money or create a
         Razorpay order — it re-checks the consent contract itself (under
         a row lock) before doing anything, so calling this without first
         calling check_consent_tool is safe, just less informative if it
-        gets denied. `idempotency_key` must be a fresh unique string per
-        distinct purchase attempt; reusing one on purpose replays the
-        prior result instead of charging again. Returns the same shape as
+        gets denied.
+
+        When buying a catalog item, pass `sku` and omit `amount` — the
+        server prices it from the catalog and ignores any amount you send.
+        Only pass `amount` + `sku_category` for a non-catalog purchase.
+
+        `idempotency_key` must be a fresh unique string per distinct
+        purchase attempt; reusing one on purpose replays the prior result
+        instead of charging again. Returns the same shape as
         POST /transaction/execute: transaction_id, status ("pending" —
         Razorpay confirms capture asynchronously via webhook, not
         synchronously here — "denied", or "failed"), reason (only on
         denial), and a human-readable reasoning string."""
-        try:
-            decimal_amount = Decimal(str(amount))
-        except InvalidOperation:
-            return {
-                "transaction_id": None,
-                "status": "denied",
-                "reason": "invalid_amount",
-                "reasoning": f"Denied: '{amount}' is not a valid amount.",
-            }
+        decimal_amount = None
+        if amount is not None:
+            try:
+                decimal_amount = Decimal(str(amount))
+            except InvalidOperation:
+                return {
+                    "transaction_id": None,
+                    "status": "denied",
+                    "reason": "invalid_amount",
+                    "reasoning": f"Denied: '{amount}' is not a valid amount.",
+                }
 
         executor = TransactionExecutor(db)
         response = executor.execute(
             consent_id=consent_id,
             amount=decimal_amount,
             sku_category=sku_category,
+            sku=sku,
             idempotency_key=idempotency_key,
         )
         return response.model_dump(mode="json")
@@ -181,7 +216,7 @@ def build_tools(db: Session) -> list:
             return {"error": "transaction_not_found", "transaction_id": transaction_id}
         return status.model_dump(mode="json")
 
-    return [check_consent_tool, execute_transaction_tool, get_status_tool]
+    return [browse_catalog_tool, check_consent_tool, execute_transaction_tool, get_status_tool]
 
 
 def build_agent(db: Session, model=None):

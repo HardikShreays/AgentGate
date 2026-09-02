@@ -27,6 +27,13 @@ class Settings(BaseSettings):
     FAILURE_MAX_ATTEMPTS: int = 2
     MERCHANT_NOTIFICATION_WEBHOOK_URL: str = "http://localhost:9999/dummy-merchant-webhook"
 
+    # Task 2 — how long a `pending` transaction's reservation is held before
+    # the lazy sweep in executor.release_stale_reservations() assumes the
+    # checkout was abandoned and returns the hold to the contract's balance.
+    # 15 min: far longer than a real checkout, short enough to self-heal
+    # within a demo session.
+    RESERVATION_TTL_SECONDS: int = 900
+
     GROQ_API_KEY: str = ""
     GROQ_MODEL: str = "openai/gpt-oss-20b"
 

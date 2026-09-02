@@ -44,7 +44,7 @@ class _FakeToolCallingModel(FakeMessagesListChatModel):
 # --- 1. Tool-level: enforcement lives in the tool, not the prompt ----------
 
 def test_check_consent_tool_denies_over_per_txn_cap_with_structured_reason(db, consent_contract):
-    check_consent_tool, _execute, _status = build_tools(db)
+    _browse, check_consent_tool, _execute, _status = build_tools(db)
 
     result = check_consent_tool.invoke(
         {"consent_id": consent_contract.consent_id, "amount": 600.0, "sku_category": "groceries"}
@@ -61,7 +61,7 @@ def test_check_consent_tool_denies_over_per_txn_cap_with_structured_reason(db, c
 
 
 def test_check_consent_tool_allows_within_limit(db, consent_contract):
-    check_consent_tool, _execute, _status = build_tools(db)
+    _browse, check_consent_tool, _execute, _status = build_tools(db)
 
     result = check_consent_tool.invoke(
         {"consent_id": consent_contract.consent_id, "amount": 450.0, "sku_category": "groceries"}
@@ -73,7 +73,7 @@ def test_check_consent_tool_allows_within_limit(db, consent_contract):
 
 
 def test_execute_transaction_tool_denies_out_of_scope_without_touching_razorpay(db, consent_contract, mock_razorpay):
-    _check, execute_transaction_tool, _status = build_tools(db)
+    _browse, _check, execute_transaction_tool, _status = build_tools(db)
 
     result = execute_transaction_tool.invoke(
         {
@@ -93,7 +93,7 @@ def test_execute_transaction_tool_denies_out_of_scope_without_touching_razorpay(
 
 
 def test_execute_transaction_tool_creates_real_order_when_allowed(db, consent_contract, mock_razorpay):
-    _check, execute_transaction_tool, _status = build_tools(db)
+    _browse, _check, execute_transaction_tool, _status = build_tools(db)
 
     result = execute_transaction_tool.invoke(
         {
@@ -110,7 +110,7 @@ def test_execute_transaction_tool_creates_real_order_when_allowed(db, consent_co
 
 
 def test_get_status_tool_returns_error_dict_for_unknown_transaction(db):
-    _check, _execute, get_status_tool = build_tools(db)
+    _browse, _check, _execute, get_status_tool = build_tools(db)
 
     result = get_status_tool.invoke({"transaction_id": "does-not-exist"})
 
@@ -118,7 +118,7 @@ def test_get_status_tool_returns_error_dict_for_unknown_transaction(db):
 
 
 def test_get_status_tool_returns_attempt_timeline(db, consent_contract, mock_razorpay):
-    _check, execute_transaction_tool, get_status_tool = build_tools(db)
+    _browse, _check, execute_transaction_tool, get_status_tool = build_tools(db)
 
     exec_result = execute_transaction_tool.invoke(
         {
@@ -180,8 +180,8 @@ def test_agent_graph_runs_check_then_execute_then_summarizes(db, consent_contrac
     assert any(e.action_type == ActionType.order_created for e in trail.entries)
 
 
-def test_agent_graph_hard_stops_at_3_iterations_and_forces_final_response(db, consent_contract):
-    """A.7: 'On the 3rd iteration without a final answer, force a
+def test_agent_graph_hard_stops_at_max_iterations_and_forces_final_response(db, consent_contract):
+    """A.7: 'On the final iteration without a final answer, force a
     response summarizing what was attempted — never silently loop.' The
     canned model here NEVER stops calling tools on its own; only the
     graph's forced-final step (past MAX_ITERATIONS) should end the run."""
@@ -191,21 +191,21 @@ def test_agent_graph_hard_stops_at_3_iterations_and_forces_final_response(db, co
             {"consent_id": consent_contract.consent_id, "amount": 1.0, "sku_category": "groceries"},
             f"call_{i}",
         )
-        for i in range(1, MAX_ITERATIONS + 1)  # exactly the 3 tool-calling turns the graph allows
+        for i in range(1, MAX_ITERATIONS + 1)  # exactly the tool-calling turns the graph allows
     ]
     # After MAX_ITERATIONS is hit, the agent node calls the *unbound*
     # model with FORCE_FINAL_PROMPT for the final turn — same fake model,
     # next response in the list.
     fake_model = _FakeToolCallingModel(
-        responses=always_calls_tool + [AIMessage(content="Stopping: used all 3 tool-call turns without a final result.")]
+        responses=always_calls_tool + [AIMessage(content="Stopping: used all tool-call turns without a final result.")]
     )
 
     result = run_agent(db, "Order something", model=fake_model)
 
-    assert result["iterations"] == 3
+    assert result["iterations"] == MAX_ITERATIONS
     final = result["messages"][-1]
     assert not getattr(final, "tool_calls", None)
     assert "stopping" in final.content.lower()
 
     tool_messages = [m for m in result["messages"] if isinstance(m, ToolMessage)]
-    assert len(tool_messages) == 3  # exactly 3 tool-calling rounds, never a 4th
+    assert len(tool_messages) == MAX_ITERATIONS  # exactly the allowed rounds, never one more

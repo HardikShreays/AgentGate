@@ -47,6 +47,7 @@ def _tmpl_consent_check(p: dict) -> str:
         "revoked_mid_transaction": "the consent contract was revoked mid-transaction",
         "out_of_scope": f"'{category}' is outside the contract's approved scope",
         "invalid_sku_category": f"'{category}' is not a recognized SKU category",
+        "unknown_sku": f"'{category}' is not a product in this merchant's catalog",
         "integrity_violation": "the stored contract failed integrity verification",
         "consent_not_found": "no matching consent contract was found",
     }.get(reason, reason or "the request did not satisfy the consent contract")
@@ -92,6 +93,15 @@ def _tmpl_integrity_violation(p: dict) -> str:
     return f"Integrity check failed: stored hash does not match recomputed hash for consent {p.get('consent_id', '?')}."
 
 
+def _tmpl_reservation_released(p: dict) -> str:
+    return (
+        f"Reservation of {_money(p.get('amount'))} released for transaction "
+        f"{p.get('transaction_id', '?')}: checkout was never completed within "
+        f"{p.get('ttl_seconds', '?')}s, so the hold was returned to the "
+        f"contract's available balance."
+    )
+
+
 _TEMPLATES = {
     ActionType.consent_check: _tmpl_consent_check,
     ActionType.order_created: _tmpl_order_created,
@@ -102,6 +112,7 @@ _TEMPLATES = {
     ActionType.revocation_processed: _tmpl_revocation_processed,
     ActionType.race_condition_detected: _tmpl_race_condition_detected,
     ActionType.integrity_violation: _tmpl_integrity_violation,
+    ActionType.reservation_released: _tmpl_reservation_released,
 }
 
 
