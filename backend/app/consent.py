@@ -107,6 +107,25 @@ def create_consent(db: Session, req) -> ConsentContract:
     return contract
 
 
+def effective_status(contract: ConsentContract) -> ConsentStatus:
+    """Stored status, upgraded to `expired` when the clock says so (Task 5).
+
+    Expiry is time-derived, so nothing writes ConsentStatus.expired — a
+    scheduler that flips rows at midnight would be more machinery than the one
+    branch is worth. check_consent() already compares against the clock
+    directly; this is the read-side equivalent so the dashboard badge agrees
+    with the engine's decision. Display only — never an enforcement path.
+    """
+    if contract.status in (ConsentStatus.revoked, ConsentStatus.exhausted):
+        return contract.status
+    expiry = contract.expiry
+    if expiry.tzinfo is None:
+        expiry = expiry.replace(tzinfo=timezone.utc)
+    if datetime.now(timezone.utc) > expiry:
+        return ConsentStatus.expired
+    return contract.status
+
+
 def revoke_consent(db: Session, consent_id: str) -> ConsentContract | None:
     contract = db.get(ConsentContract, consent_id)
     if contract is None:

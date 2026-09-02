@@ -5,18 +5,22 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
+from app import catalog as catalog_svc
 from app import consent as consent_svc
 from app import audit as audit_svc
 from app.db import get_db, init_db
 from app.config import get_settings
 from app.executor import TransactionExecutor
 from app.executor import get_transaction_status as get_transaction_status_svc
+from app.executor import release_stale_reservations
+from app.failure import FailureHandler
 from app.models import ActionType
 from app.models import Transaction
 from app.razorpay_client import get_client, verify_payment_signature
 from app.webhooks import router as webhooks_router
 from app.webhooks import _handle_captured
 from app.schemas import (
+    CatalogResponse,
     ConfirmPaymentRequest,
     ConsentCreateRequest,
     ConsentResponse,
@@ -25,6 +29,8 @@ from app.schemas import (
     DemoModeResponse,
     ExecuteTransactionRequest,
     ExecuteTransactionResponse,
+    Product,
+    SimulateFailureRequest,
     AuditTrailResponse,
     TransactionStatusResponse,
     AgentMessageRequest,
@@ -65,7 +71,15 @@ def _to_consent_response(contract) -> ConsentResponse:
     cached or trusted at rest. This is what backs the Consent Inspector's
     "integrity-hash status (valid/tampered)" requirement (Phase 6)."""
     response = ConsentResponse.model_validate(contract)
-    return response.model_copy(update={"integrity_valid": consent_svc.verify_integrity(contract)})
+    return response.model_copy(
+        update={
+            "integrity_valid": consent_svc.verify_integrity(contract),
+            # Display-only: stored status upgraded to `expired` when the clock
+            # says so, so the dashboard badge agrees with what check_consent
+            # would decide (Task 5). check_consent stays the enforcement path.
+            "status": consent_svc.effective_status(contract),
+        }
+    )
 
 
 @app.post("/consent", response_model=ConsentResponse, status_code=201)
@@ -77,6 +91,10 @@ def create_consent(req: ConsentCreateRequest, db: Session = Depends(get_db)):
 @app.get("/consent/{consent_id}", response_model=ConsentResponse)
 def get_consent(consent_id: str, db: Session = Depends(get_db)):
     from app.models import ConsentContract
+
+    # Return any budget held by abandoned checkouts before rendering, so the
+    # dashboard never shows a stale `spend_reserved` (Task 2).
+    release_stale_reservations(db, consent_id)
 
     contract = db.get(ConsentContract, consent_id)
     if contract is None:
@@ -108,6 +126,7 @@ def execute_transaction(req: ExecuteTransactionRequest, db: Session = Depends(ge
         consent_id=req.consent_id,
         amount=req.amount,
         sku_category=req.sku_category,
+        sku=req.sku,
         idempotency_key=req.idempotency_key,
         simulate_delay_ms=req.simulate_delay_ms,
     )
@@ -153,8 +172,60 @@ def get_demo_mode():
 
 @app.post("/demo-mode", response_model=DemoModeResponse)
 def set_demo_mode(req: DemoModeRequest):
+    """Runtime DEMO_MODE toggle for the dashboard's demo pages.
+
+    Intentionally unauthenticated: this whole API is a test-mode demo with no
+    auth layer (see README §10). The blast radius is bounded regardless —
+    `simulate_delay_ms` is capped at 5000ms in the schema, so even with demo
+    mode on a caller cannot hold a consent row lock open indefinitely.
+
+    This mutates the process-local `@lru_cache`d Settings singleton, so it only
+    affects the worker that handled the request — it will desync under
+    multi-worker uvicorn. Fine for the single-process demo; noted so it isn't
+    discovered the hard way.
+    """
     settings.DEMO_MODE = req.enabled
     return DemoModeResponse(enabled=settings.DEMO_MODE)
+
+
+@app.get("/catalog", response_model=CatalogResponse)
+def get_catalog(category: str | None = None):
+    """Agent-readable merchant catalog (Task 1). The buyer agent reads this to
+    decide WHAT to buy; the consent engine decides whether it MAY. Prices are
+    served from here and re-resolved server-side at execute time — a caller
+    cannot name its own price."""
+    products = catalog_svc.list_products(category)
+    return CatalogResponse(
+        merchant_id="m_groceries_01",
+        product_count=len(products),
+        products=[Product(**p) for p in products],
+    )
+
+
+@app.post("/demo/simulate-failure", response_model=TransactionStatusResponse)
+def simulate_failure(req: SimulateFailureRequest, db: Session = Depends(get_db)):
+    """Invoke the REAL FailureHandler on an existing pending transaction,
+    exactly as app.webhooks does on a verified payment.failed event (Task 6).
+
+    This does not fake a timeline: it is the same handler, the same bounded
+    retry, the same hard stop and merchant notification. It only removes the
+    need to drive Razorpay's hosted mock-bank UI twice to see it.
+
+    Returns 404 when DEMO_MODE is off so the endpoint doesn't advertise itself
+    in a non-demo deployment.
+    """
+    if not settings.DEMO_MODE:
+        raise HTTPException(status_code=404, detail="not found")
+
+    txn = db.get(Transaction, req.transaction_id)
+    if txn is None:
+        raise HTTPException(status_code=404, detail="transaction not found")
+
+    FailureHandler(db).handle(req.transaction_id, req.error_reason)
+    status = get_transaction_status_svc(db, req.transaction_id)
+    if status is None:
+        raise HTTPException(status_code=404, detail="transaction not found")
+    return status
 
 
 @app.get("/audit/{consent_id}", response_model=AuditTrailResponse)

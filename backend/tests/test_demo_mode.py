@@ -26,3 +26,31 @@ def test_demo_mode_can_be_toggled_at_runtime():
             assert executor_module.settings.DEMO_MODE is False
     finally:
         settings.DEMO_MODE = original
+
+
+def test_simulate_delay_ms_is_bounded():
+    """Task 4 — a caller cannot request an unbounded delay and hold a consent
+    row lock open. The schema caps it at 5000ms."""
+    with TestClient(app, raise_server_exceptions=True) as client:
+        r = client.post(
+            "/transaction/execute",
+            json={
+                "consent_id": "does-not-matter",
+                "amount": "100.00",
+                "sku_category": "groceries",
+                "idempotency_key": "bound-check",
+                "simulate_delay_ms": 999999,
+            },
+        )
+        assert r.status_code == 422
+
+
+def test_execute_request_requires_sku_or_amount_plus_category():
+    """Task 1 — a request with neither a sku nor (amount + sku_category) is
+    meaningless and must fail at the schema boundary."""
+    with TestClient(app, raise_server_exceptions=True) as client:
+        r = client.post(
+            "/transaction/execute",
+            json={"consent_id": "x", "idempotency_key": "k"},
+        )
+        assert r.status_code == 422
