@@ -24,8 +24,10 @@ Tools are built in-process against a single SQLAlchemy Session (per A.16:
 "or an in-process function call if agent and API share a runtime" — the
 demo's LangGraph process shares app.consent/app.executor's runtime), not
 over HTTP, so build_agent(db) takes a Session and closes over it in the
-three @tool-decorated functions.
+four @tool-decorated functions, along with a per-run idempotency scope and
+a result sink (see build_tools).
 """
+import uuid
 from decimal import Decimal, InvalidOperation
 from typing import Annotated, Optional, TypedDict
 
@@ -64,15 +66,19 @@ SYSTEM_PROMPT = (
     "your judgement. If a tool returns denied/allowed=false, report that "
     "denial and its reason plainly; do not retry with a different amount "
     "or category to work around it, and do not argue with the result.\n\n"
-    "Typical flow for a purchase request: if the human names a product in "
-    "words rather than a sku, call browse_catalog_tool first to find the "
-    "matching sku and its real price. Then call check_consent_tool with that "
-    "price. If it is not allowed, stop and report the reason. If it is "
-    "allowed, call execute_transaction_tool with the sku (omit amount — the "
-    "server prices it from the catalog). Then summarize the outcome for the "
-    "human in one or two sentences, including the transaction id or denial "
-    "reason and the reasoning string the tool returned. Never state a price "
-    "that did not come from a tool result."
+    "Typical flow for a purchase request: unless the human gave you an exact "
+    "sku string, call browse_catalog_tool FIRST and pick the catalog item "
+    "that best matches what they asked for — even if they only named a "
+    "category or an amount, choose a concrete product from the list rather "
+    "than falling back to a bare amount. Then call check_consent_tool with "
+    "that product's price and sku. If it is not allowed, stop and report the "
+    "reason. If it is allowed, call execute_transaction_tool with the sku "
+    "(omit amount — the server prices it from the catalog). Then summarize "
+    "the outcome for the human in one or two sentences, naming the product "
+    "you bought, and including the transaction id or denial reason and the "
+    "reasoning string the tool returned. Never state a price that did not "
+    "come from a tool result. You do not choose or pass an idempotency key — "
+    "the system handles that."
 )
 
 FORCE_FINAL_PROMPT = (
@@ -114,10 +120,20 @@ def _log_agent_consent_check(db: Session, consent_id: str, amount: Decimal, sku_
         log_action(db, consent_id, ActionType.integrity_violation, {"consent_id": consent_id})
 
 
-def build_tools(db: Session) -> list:
+def build_tools(db: Session, run_id: str, sink: dict) -> list:
     """A.16 — the four tools bound to the agent. Each is a thin wrapper:
     no money logic lives here, only argument parsing and a call straight
-    into the already-tested service layer."""
+    into the already-tested service layer.
+
+    `run_id` scopes the idempotency key: the LLM never sees or chooses it
+    (at temperature=0 it invents the same literal every run, which silently
+    replays the first transaction forever). The key is
+    `{run_id}:{sku or category:amount}`, so a retry *within* one agent run
+    dedups correctly while every new run genuinely transacts.
+
+    `sink` is a mutable dict the execute tool writes its last result into,
+    so run_agent() can surface the transaction id / Razorpay order id to the
+    HTTP caller without re-parsing the message trace."""
 
     @tool
     def browse_catalog_tool(category: Optional[str] = None) -> dict:
@@ -159,7 +175,6 @@ def build_tools(db: Session) -> list:
     @tool
     def execute_transaction_tool(
         consent_id: str,
-        idempotency_key: str,
         sku: Optional[str] = None,
         amount: Optional[float] = None,
         sku_category: Optional[str] = None,
@@ -175,13 +190,12 @@ def build_tools(db: Session) -> list:
         server prices it from the catalog and ignores any amount you send.
         Only pass `amount` + `sku_category` for a non-catalog purchase.
 
-        `idempotency_key` must be a fresh unique string per distinct
-        purchase attempt; reusing one on purpose replays the prior result
-        instead of charging again. Returns the same shape as
-        POST /transaction/execute: transaction_id, status ("pending" —
-        Razorpay confirms capture asynchronously via webhook, not
-        synchronously here — "denied", or "failed"), reason (only on
-        denial), and a human-readable reasoning string."""
+        You do NOT pass an idempotency key — the system scopes one to this
+        run automatically. Returns the same shape as POST /transaction/execute:
+        transaction_id, status ("pending" — Razorpay confirms capture
+        asynchronously via webhook, not synchronously here — "denied", or
+        "failed"), reason (only on denial), and a human-readable reasoning
+        string."""
         decimal_amount = None
         if amount is not None:
             try:
@@ -194,6 +208,9 @@ def build_tools(db: Session) -> list:
                     "reasoning": f"Denied: '{amount}' is not a valid amount.",
                 }
 
+        purchase_id = sku or f"{sku_category}:{decimal_amount}"
+        idempotency_key = f"{run_id}:{purchase_id}"
+
         executor = TransactionExecutor(db)
         response = executor.execute(
             consent_id=consent_id,
@@ -202,7 +219,9 @@ def build_tools(db: Session) -> list:
             sku=sku,
             idempotency_key=idempotency_key,
         )
-        return response.model_dump(mode="json")
+        payload = response.model_dump(mode="json")
+        sink["execute_result"] = {**payload, "consent_id": consent_id, "sku": sku}
+        return payload
 
     @tool
     def get_status_tool(transaction_id: str) -> dict:
@@ -219,11 +238,16 @@ def build_tools(db: Session) -> list:
     return [browse_catalog_tool, check_consent_tool, execute_transaction_tool, get_status_tool]
 
 
-def build_agent(db: Session, model=None):
+def build_agent(db: Session, model=None, run_id: Optional[str] = None, sink: Optional[dict] = None):
     """Compile the Phase 5 buyer-agent graph. `model` is injectable so
     tests can swap in a canned/fake chat model instead of making a real
-    Groq API call; defaults to ChatGroq using GROQ_API_KEY / GROQ_MODEL."""
-    tools = build_tools(db)
+    Groq API call; defaults to ChatGroq using GROQ_API_KEY / GROQ_MODEL.
+
+    `run_id` / `sink` are normally supplied by run_agent(); defaulted here
+    so a test that builds the graph directly still gets a usable agent."""
+    run_id = run_id or str(uuid.uuid4())
+    sink = sink if sink is not None else {}
+    tools = build_tools(db, run_id, sink)
 
     if model is None:
         model = ChatGroq(
@@ -272,10 +296,17 @@ def build_agent(db: Session, model=None):
 def run_agent(db: Session, user_message: str, model=None) -> dict:
     """Convenience entry point for scripts/API use: run the agent once on
     a single natural-language request and return the final text plus the
-    full message trace, so a caller can print/log either."""
+    full message trace, so a caller can print/log either.
+
+    `execute_result` is the raw response of the last execute_transaction_tool
+    call this run made (or None) — the HTTP layer uses it to hand the
+    frontend a transaction id / Razorpay order id so the agent flow can be
+    completed through Checkout, exactly like the dashboard's execute panel."""
     from langchain_core.messages import HumanMessage
 
-    agent = build_agent(db, model=model)
+    run_id = str(uuid.uuid4())
+    sink: dict = {}
+    agent = build_agent(db, model=model, run_id=run_id, sink=sink)
     result = agent.invoke(
         {"messages": [HumanMessage(content=user_message)], "iterations": 0},
         config={"recursion_limit": 50},
@@ -285,4 +316,5 @@ def run_agent(db: Session, user_message: str, model=None) -> dict:
         "final_response": final_message.content,
         "messages": result["messages"],
         "iterations": result.get("iterations", 0),
+        "execute_result": sink.get("execute_result"),
     }

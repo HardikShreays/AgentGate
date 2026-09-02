@@ -44,7 +44,7 @@ class _FakeToolCallingModel(FakeMessagesListChatModel):
 # --- 1. Tool-level: enforcement lives in the tool, not the prompt ----------
 
 def test_check_consent_tool_denies_over_per_txn_cap_with_structured_reason(db, consent_contract):
-    _browse, check_consent_tool, _execute, _status = build_tools(db)
+    _browse, check_consent_tool, _execute, _status = build_tools(db, 'test-run', {})
 
     result = check_consent_tool.invoke(
         {"consent_id": consent_contract.consent_id, "amount": 600.0, "sku_category": "groceries"}
@@ -61,7 +61,7 @@ def test_check_consent_tool_denies_over_per_txn_cap_with_structured_reason(db, c
 
 
 def test_check_consent_tool_allows_within_limit(db, consent_contract):
-    _browse, check_consent_tool, _execute, _status = build_tools(db)
+    _browse, check_consent_tool, _execute, _status = build_tools(db, 'test-run', {})
 
     result = check_consent_tool.invoke(
         {"consent_id": consent_contract.consent_id, "amount": 450.0, "sku_category": "groceries"}
@@ -73,14 +73,13 @@ def test_check_consent_tool_allows_within_limit(db, consent_contract):
 
 
 def test_execute_transaction_tool_denies_out_of_scope_without_touching_razorpay(db, consent_contract, mock_razorpay):
-    _browse, _check, execute_transaction_tool, _status = build_tools(db)
+    _browse, _check, execute_transaction_tool, _status = build_tools(db, 'test-run', {})
 
     result = execute_transaction_tool.invoke(
         {
             "consent_id": consent_contract.consent_id,
             "amount": 100.0,
             "sku_category": "electronics",  # contract scope is ["groceries"]
-            "idempotency_key": "agent-key-1",
         }
     )
 
@@ -93,14 +92,13 @@ def test_execute_transaction_tool_denies_out_of_scope_without_touching_razorpay(
 
 
 def test_execute_transaction_tool_creates_real_order_when_allowed(db, consent_contract, mock_razorpay):
-    _browse, _check, execute_transaction_tool, _status = build_tools(db)
+    _browse, _check, execute_transaction_tool, _status = build_tools(db, 'test-run', {})
 
     result = execute_transaction_tool.invoke(
         {
             "consent_id": consent_contract.consent_id,
             "amount": 450.0,
             "sku_category": "groceries",
-            "idempotency_key": "agent-key-2",
         }
     )
 
@@ -110,7 +108,7 @@ def test_execute_transaction_tool_creates_real_order_when_allowed(db, consent_co
 
 
 def test_get_status_tool_returns_error_dict_for_unknown_transaction(db):
-    _browse, _check, _execute, get_status_tool = build_tools(db)
+    _browse, _check, _execute, get_status_tool = build_tools(db, 'test-run', {})
 
     result = get_status_tool.invoke({"transaction_id": "does-not-exist"})
 
@@ -118,14 +116,13 @@ def test_get_status_tool_returns_error_dict_for_unknown_transaction(db):
 
 
 def test_get_status_tool_returns_attempt_timeline(db, consent_contract, mock_razorpay):
-    _browse, _check, execute_transaction_tool, get_status_tool = build_tools(db)
+    _browse, _check, execute_transaction_tool, get_status_tool = build_tools(db, 'test-run', {})
 
     exec_result = execute_transaction_tool.invoke(
         {
             "consent_id": consent_contract.consent_id,
             "amount": 200.0,
             "sku_category": "groceries",
-            "idempotency_key": "agent-key-3",
         }
     )
     status = get_status_tool.invoke({"transaction_id": exec_result["transaction_id"]})
@@ -160,7 +157,6 @@ def test_agent_graph_runs_check_then_execute_then_summarizes(db, consent_contrac
                     "consent_id": consent_contract.consent_id,
                     "amount": 450.0,
                     "sku_category": "groceries",
-                    "idempotency_key": "agent-graph-key-1",
                 },
                 "call_2",
             ),
@@ -209,3 +205,55 @@ def test_agent_graph_hard_stops_at_max_iterations_and_forces_final_response(db, 
 
     tool_messages = [m for m in result["messages"] if isinstance(m, ToolMessage)]
     assert len(tool_messages) == MAX_ITERATIONS  # exactly the allowed rounds, never one more
+
+
+def _buy_rice_responses():
+    """A canned check -> execute(sku) -> summarize sequence, fresh each call
+    since _FakeToolCallingModel consumes its response list."""
+    return [
+        _tool_call_message(
+            "check_consent_tool",
+            {"consent_id": CONSENT_ID_PLACEHOLDER["id"], "amount": 420.0, "sku_category": "groceries", "sku": "sku_rice_5kg"},
+            "c1",
+        ),
+        _tool_call_message(
+            "execute_transaction_tool",
+            {"consent_id": CONSENT_ID_PLACEHOLDER["id"], "sku": "sku_rice_5kg"},
+            "c2",
+        ),
+        AIMessage(content="Bought the 5 kg rice; transaction pending."),
+    ]
+
+
+CONSENT_ID_PLACEHOLDER = {"id": None}
+
+
+def test_repeated_identical_agent_runs_do_not_replay_the_same_transaction(db, consent_contract, mock_razorpay):
+    """The idempotency key is scoped per run_agent() call, not chosen by the
+    model — so an identical request on a second run genuinely transacts
+    instead of silently replaying the first run's transaction."""
+    CONSENT_ID_PLACEHOLDER["id"] = consent_contract.consent_id
+
+    first = run_agent(db, "buy me a bag of rice", model=_FakeToolCallingModel(responses=_buy_rice_responses()))
+    second = run_agent(db, "buy me a bag of rice", model=_FakeToolCallingModel(responses=_buy_rice_responses()))
+
+    tx1 = first["execute_result"]["transaction_id"]
+    tx2 = second["execute_result"]["transaction_id"]
+    assert tx1 and tx2 and tx1 != tx2
+
+    order_rows = [
+        e for e in audit_svc.get_audit_trail(db, consent_contract.consent_id).entries
+        if e.action_type == ActionType.order_created
+    ]
+    assert len(order_rows) == 2
+
+
+def test_execute_result_is_surfaced_for_the_http_layer(db, consent_contract, mock_razorpay):
+    CONSENT_ID_PLACEHOLDER["id"] = consent_contract.consent_id
+    result = run_agent(db, "buy me a bag of rice", model=_FakeToolCallingModel(responses=_buy_rice_responses()))
+
+    ex = result["execute_result"]
+    assert ex["status"] == "pending"
+    assert ex["razorpay_order_id"]
+    assert ex["consent_id"] == consent_contract.consent_id
+    assert ex["sku"] == "sku_rice_5kg"

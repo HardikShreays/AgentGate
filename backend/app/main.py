@@ -34,6 +34,7 @@ from app.schemas import (
     AuditTrailResponse,
     TransactionStatusResponse,
     AgentMessageRequest,
+    AgentMessageResponse,
 )
 
 
@@ -246,15 +247,25 @@ def get_transaction_status(transaction_id: str, db: Session = Depends(get_db)):
     return status
 
 
-@app.post("/agent/message")
+@app.post("/agent/message", response_model=AgentMessageResponse)
 def agent_message(req: AgentMessageRequest, db: Session = Depends(get_db)):
     """Phase 5 — a minimal HTTP entry point for the buyer agent, so the
     dashboard or a demo script can drive it without importing app.agent
-    directly. Not part of the non-negotiable scope (Section 0 lists
-    exactly 2 dashboard pages and doesn't mention a chat UI), so this is
-    intentionally thin: one endpoint, no streaming, no session/thread
-    persistence across calls."""
+    directly. No streaming, no session/thread persistence across calls.
+
+    When the agent's run created a real Razorpay order, the response also
+    carries the transaction id / order id so the chat UI can open Checkout
+    and complete the purchase — otherwise the agent flow dead-ends at
+    `pending` and the reservation sweep expires it 15 minutes later."""
     from app.agent import run_agent
 
     result = run_agent(db, req.message)
-    return {"response": result["final_response"]}
+    ex = result.get("execute_result") or {}
+    return AgentMessageResponse(
+        response=result["final_response"],
+        consent_id=ex.get("consent_id"),
+        transaction_id=ex.get("transaction_id"),
+        razorpay_order_id=ex.get("razorpay_order_id"),
+        status=ex.get("status"),
+        reason=ex.get("reason"),
+    )

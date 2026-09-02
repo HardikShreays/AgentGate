@@ -173,3 +173,15 @@ class AuditTrailResponse(BaseModel):
 
 class AgentMessageRequest(BaseModel):
     message: str
+
+
+class AgentMessageResponse(BaseModel):
+    response: str
+    # Present only when the agent's run created a real Razorpay order, so the
+    # dashboard chat can open Checkout and complete the flow the same way the
+    # execute panel does. None for a denied / catalog-only / no-purchase turn.
+    consent_id: Optional[str] = None
+    transaction_id: Optional[str] = None
+    razorpay_order_id: Optional[str] = None
+    status: Optional[str] = None
+    reason: Optional[str] = None
