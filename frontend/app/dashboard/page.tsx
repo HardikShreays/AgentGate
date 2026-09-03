@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { GateMark } from "@/components/Sidebar";
 import { CreateConsentForm } from "@/components/CreateConsentForm";
-import { ArchitectureDiagram } from "@/components/ArchitectureDiagram";
 import { getRecentConsents, rememberConsentId, RecentConsent } from "@/lib/recent";
 import { truncateMiddle, formatDateTime } from "@/lib/format";
 
@@ -126,20 +125,6 @@ export default function Dashboard() {
               </ul>
             )}
           </div>
-        </div>
-      </div>
-
-      <div className="mt-8">
-        <div className="mb-2 text-[11px] font-medium uppercase tracking-label text-faint">
-          Architecture
-        </div>
-        <div className="rounded-lg border border-border bg-surface p-4 shadow-card">
-          <ArchitectureDiagram />
-          <p className="mt-2 text-center text-[11px] text-faint">
-            Neither money decisions nor prices come from the LLM — the agent picks a catalog
-            SKU, the server prices it, and the tools call straight into the same Consent
-            Engine and Tx Executor the HTTP API uses.
-          </p>
         </div>
       </div>
     </div>
