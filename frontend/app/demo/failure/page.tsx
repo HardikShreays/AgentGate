@@ -13,6 +13,7 @@ import { Timeline } from "@/components/Timeline";
 import { TransactionStatusCard } from "@/components/TransactionStatusStepper";
 import { DemoModeNotice } from "@/components/DemoModeNotice";
 import { CopyButton } from "@/components/CopyButton";
+import { PageHeader } from "@/components/PageHeader";
 
 // Same happy-path numbers as CreateConsentForm / the revocation demo, so a
 // cross-check against the README lines up.
@@ -115,19 +116,13 @@ export default function FailureDemoPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-8 py-8">
-      <div className="mb-6">
-        <div className="text-[11px] font-medium uppercase tracking-label text-faint">
-          Pitch script · 4:30–5:00 · "one failure handled gracefully"
-        </div>
-        <h1 className="mt-1 text-xl font-semibold text-navy">Live failure-path demo</h1>
-        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted">
-          Forces a real <code className="font-mono">payment.failed</code> through the same
-          FailureHandler a Razorpay webhook would hit. One bounded retry after a real delay,
-          then on the second failure the transaction is marked terminal, a merchant
-          notification is logged, and a third attempt is provably never created — calling the
-          trigger again changes nothing.
-        </p>
-      </div>
+      <PageHeader title="Handle a failed payment">
+        Forces a real <code className="font-mono text-[12px]">payment.failed</code> through the
+        same FailureHandler a Razorpay webhook would hit. One bounded retry after a real
+        delay, then on the second failure the transaction is marked terminal, a merchant
+        notification is logged, and a third attempt is provably never created — calling the
+        trigger again changes nothing.
+      </PageHeader>
 
       <div className="space-y-4">
         <DemoModeNotice mode="true" />

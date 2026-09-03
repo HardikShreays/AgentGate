@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -86,4 +86,32 @@
 
 .animate-toast-in {
   animation: toast-in 180ms ease-out forwards;
+}
+
+/* Landing hero — the audit ledger reveals one row at a time on load so
+   the read is "approved … revoked … re-checked … no order created",
+   the same sequence the revocation demo produces. Per-row delay is set
+   inline via --row. Reduced-motion: the global rule zeroes the delay so
+   every row is visible immediately. */
+@keyframes ledger-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-ledger-row {
+  opacity: 0;
+  animation: ledger-row-in 360ms ease-out forwards;
+  animation-delay: var(--row, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ledger-row {
+    animation-delay: 0ms !important;
+  }
 }

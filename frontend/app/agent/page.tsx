@@ -1,18 +1,14 @@
 import { AgentChat } from "@/components/AgentChat";
+import { PageHeader } from "@/components/PageHeader";
 
 export default function AgentPage() {
   return (
     <div className="mx-auto max-w-3xl px-8 py-8">
-      <div className="mb-4">
-        <div className="text-[11px] font-medium uppercase tracking-label text-faint">
-          Not scripted — differentiator
-        </div>
-        <h1 className="mt-1 text-lg font-semibold text-navy">Buyer Agent chat</h1>
-        <p className="mt-1 text-sm text-muted">
-          Drive the LangGraph buyer agent directly instead of curling{" "}
-          <code className="font-mono text-xs">POST /agent/message</code>.
-        </p>
-      </div>
+      <PageHeader title="Buyer agent chat">
+        Ask the LangGraph buyer agent to make a purchase against a consent. Each message
+        is a fresh, memory-less run — name the product and the consent id every time. If
+        the agent creates an order, checkout opens right here.
+      </PageHeader>
       <AgentChat />
     </div>
   );

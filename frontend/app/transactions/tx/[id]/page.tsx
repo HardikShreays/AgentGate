@@ -66,9 +66,7 @@ export default function TransactionStatusPage() {
       <div className="sticky top-0 z-10 border-b border-border bg-surface/85 px-8 py-4 backdrop-blur">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <div className="text-[11px] font-medium uppercase tracking-label text-faint">
-              Transaction status
-            </div>
+            <div className="text-xs font-medium text-faint">Transaction</div>
             <h1 className="mt-1 flex min-w-0 items-center gap-1 truncate font-mono text-sm text-navySoft">
               <span className="truncate" title={transactionId}>
                 {transactionId}

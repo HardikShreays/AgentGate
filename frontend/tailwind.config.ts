@@ -16,6 +16,7 @@ const config: Config = {
       colors: {
         // Surfaces
         canvas: "#F6F8FC",
+        inkDeep: "#071634",
         surface: "#FFFFFF",
         surfaceMuted: "#F1F5FB",
         surfaceSunken: "#EAF0F8",
@@ -56,7 +57,18 @@ const config: Config = {
           "Arial",
           "sans-serif",
         ],
+        // Display + ledger voice — monospace as "deterministic audit trail",
+        // used large and tight on the landing page. Sibling of the mono
+        // face below so headline and audit rows read as one system.
+        display: [
+          "IBM Plex Mono",
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "monospace",
+        ],
         mono: [
+          "IBM Plex Mono",
           "ui-monospace",
           "SFMono-Regular",
           "JetBrains Mono",

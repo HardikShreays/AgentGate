@@ -130,18 +130,11 @@ export function AgentChat() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] flex-col rounded-lg border border-border bg-surface shadow-card">
+    <div className="flex h-[calc(100vh-13rem)] min-h-[420px] flex-col rounded-lg border border-border bg-surface shadow-card">
       <div className="border-b border-border p-4">
-        <div className="text-sm font-semibold text-navy">Buyer Agent</div>
-        <p className="mt-0.5 text-xs text-muted">
-          POST /agent/message — a ReAct loop bound to browse_catalog_tool,
-          check_consent_tool, execute_transaction_tool, and get_status_tool. Each
-          message is a fresh, memory-less run: name the product and the consent id
-          every time. If the agent creates an order, checkout opens here.
-        </p>
-        <label className="mt-3 block">
-          <span className="block text-[11px] font-medium uppercase tracking-label text-faint">
-            Watch audit trail for (optional)
+        <label className="block">
+          <span className="block text-xs font-medium text-faint">
+            Consent to watch the audit trail for (optional)
           </span>
           <input
             value={consentId}

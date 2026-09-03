@@ -8,6 +8,7 @@ import { Timeline } from "@/components/Timeline";
 import { DemoModeNotice } from "@/components/DemoModeNotice";
 import { RaceResultCards } from "@/components/RaceResultCards";
 import { CopyButton } from "@/components/CopyButton";
+import { PageHeader } from "@/components/PageHeader";
 
 // spend_limit === per_txn_max so the *remaining balance* is the binding
 // constraint being tested, not the per-transaction cap — matches
@@ -124,19 +125,14 @@ export default function RaceDemoPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-8 py-8">
-      <div className="mb-6">
-        <div className="text-[11px] font-medium uppercase tracking-label text-faint">
-          Pitch script · 3:00–3:40 / Appendix A.6
-        </div>
-        <h1 className="mt-1 text-xl font-semibold text-navy">Live race-condition demo</h1>
-        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted">
-          Fires two concurrent transactions against a fresh ₹500 consent, ₹300 each — together they
-          exceed the remaining balance. The row lock (<code className="font-mono">SELECT … FOR UPDATE</code>)
-          serializes them: exactly one is accepted, the other is denied with{" "}
-          <code className="font-mono">insufficient_remaining_balance</code>, and spend never exceeds the
-          limit.
-        </p>
-      </div>
+      <PageHeader title="Race two transactions against one budget">
+        Fires two concurrent transactions against a fresh ₹500 consent, ₹300 each — together
+        they exceed the remaining balance. The row lock (
+        <code className="font-mono text-[12px]">SELECT … FOR UPDATE</code>) serializes them:
+        exactly one is accepted, the other is denied with{" "}
+        <code className="font-mono text-[12px]">insufficient_remaining_balance</code>, and
+        spend never exceeds the limit.
+      </PageHeader>
 
       <div className="space-y-4">
         <DemoModeNotice mode="false" />

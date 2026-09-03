@@ -7,6 +7,7 @@ import { truncateMiddle } from "@/lib/format";
 import { Timeline } from "@/components/Timeline";
 import { DemoModeNotice, DemoModeMismatch } from "@/components/DemoModeNotice";
 import { CopyButton } from "@/components/CopyButton";
+import { PageHeader } from "@/components/PageHeader";
 
 // Same values CreateConsentForm ships with, so this run lines up with the
 // README's happy-path numbers if someone cross-checks it live.
@@ -131,18 +132,12 @@ export default function RevocationDemoPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-8 py-8">
-      <div className="mb-6">
-        <div className="text-[11px] font-medium uppercase tracking-label text-faint">
-          Pitch script · 3:40–4:30
-        </div>
-        <h1 className="mt-1 text-xl font-semibold text-navy">Live revocation-mid-transaction demo</h1>
-        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted">
-          Starts an execute call with a 3-second simulated delay, then fires an independent revoke
-          request 1 second in. The executor's post-delay re-check sees the revoked status and aborts
-          before a Razorpay order is ever created — proving the bound is enforced live, not just
-          checked once at the start.
-        </p>
-      </div>
+      <PageHeader title="Revoke a transaction mid-flight">
+        Starts an execute call with a 3-second simulated delay, then fires an independent
+        revoke request 1 second in. The executor&rsquo;s post-delay re-check sees the revoked
+        status and aborts before a Razorpay order is ever created — proving the bound is
+        enforced live, not just checked once at the start.
+      </PageHeader>
 
       <div className="space-y-4">
         <DemoModeNotice mode="true" />

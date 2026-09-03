@@ -58,9 +58,9 @@ export function Sidebar() {
   return (
     <aside className="flex h-screen w-64 shrink-0 flex-col border-r border-border bg-surface">
       <div className="border-b border-border px-5 py-5">
-        <Link href="/" className="group flex items-center gap-2.5">
+        <Link href="/dashboard" className="group flex items-center gap-2.5">
           <GateMark />
-          <span className="font-sans text-[15px] font-semibold tracking-wordmark text-navy">
+          <span className="font-mono text-[14px] font-medium tracking-wordmark text-navy">
             AgentGate
           </span>
         </Link>
@@ -70,8 +70,8 @@ export function Sidebar() {
       </div>
 
       <form onSubmit={jumpTo("consent")} className="border-b border-border px-5 py-4">
-        <label htmlFor="lookup" className="block text-[11px] font-medium uppercase tracking-label text-faint">
-          Consent ID
+        <label htmlFor="lookup" className="block text-xs font-medium text-faint">
+          Jump to a consent
         </label>
         <input
           id="lookup"
@@ -100,12 +100,12 @@ export function Sidebar() {
 
       <nav className="flex-1 px-3 py-4">
         <NavLink
-          href={currentId ? `/consent/${currentId}` : "/"}
+          href={currentId ? `/consent/${currentId}` : "/dashboard"}
           label="Consent Inspector"
           active={pathname?.startsWith("/consent/") ?? false}
         />
         <NavLink
-          href={currentId ? `/transactions/${currentId}` : "/"}
+          href={currentId ? `/transactions/${currentId}` : "/dashboard"}
           label="Transaction Timeline"
           active={
             (pathname?.startsWith("/transactions/") && !pathname.startsWith("/transactions/tx/")) ??
@@ -118,9 +118,7 @@ export function Sidebar() {
           active={pathname?.startsWith("/agent") ?? false}
         />
 
-        <div className="mb-1.5 mt-5 px-3 text-[10px] font-medium uppercase tracking-label text-faint">
-          Live demos
-        </div>
+        <div className="mb-1.5 mt-5 px-3 text-xs font-medium text-faint">Live demos</div>
         <NavLink
           href="/demo/revocation"
           label="Revocation mid-txn"
