@@ -25,7 +25,70 @@ Measured, reproducible, on real Postgres and real Razorpay test mode:
 |---|---|---|
 | No double-spend under concurrency |  `scripts/race_test.py --runs 250` ([log](backend/scripts/results/race_250runs.log)) | **250/250** races closed correctly |
 | Revocation lands mid-transaction |  `scripts/revocation_demo.py --runs 50` ([log](backend/scripts/results/revocation_50runs.log)) | **50/50** aborted before Razorpay was called |
-| Suite green | `pytest tests/ -q` (CI, every push) | **56 passed** |
+| Suite green | `pytest tests/ -q` (CI, every push) | **67 passed** |
+
+---
+
+## Screenshots
+
+<table>
+<tr>
+<td width="50%">
+
+**Landing page**
+![Landing page](docs/screenshots/01-landing.png)
+
+</td>
+<td width="50%">
+
+**Merchant dashboard**
+![Merchant dashboard](docs/screenshots/02-dashboard.png)
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**Consent Inspector** — spend limit, integrity hash, live balance
+![Consent Inspector](docs/screenshots/03-consent-inspector.png)
+
+</td>
+<td width="50%">
+
+**Transaction Timeline** — per-attempt status, webhook state
+![Transaction Timeline](docs/screenshots/04-transaction-timeline.png)
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**Live revocation-mid-transaction demo**
+![Revocation demo](docs/screenshots/05-demo-revocation.png)
+
+</td>
+<td width="50%">
+
+**Live race-condition demo**
+![Race condition demo](docs/screenshots/06-demo-race.png)
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**Buyer agent chat** (LangGraph, real tool calls)
+![Buyer agent chat](docs/screenshots/07-agent-chat.png)
+
+</td>
+<td width="50%">
+
+**Architecture**
+![Architecture diagram](docs/screenshots/00-architecture.png)
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -50,17 +113,26 @@ enforced *during* a transaction, not just checked at the door.
 
 ### What this deliberately does not do
 
-**There is no authentication.** Every endpoint is open: any caller can
-create a consent, spend against one, or revoke one. This is the biggest
-hole in the system and it is a scoping decision, not an oversight. The
-threat model here is *"the agent overspends, or keeps spending after the
-human says stop"* — bounding and revoking a known agent's authority. It is
-not *"an attacker forges a consent or revokes someone else's."* In
-production the consent-issuing and revoking endpoints belong behind the
-human's authenticated session and `execute` behind an agent credential
-scoped to one consent. Bolting a token check on here would have blurred
-which guarantees are actually *enforced* (the row lock, the integrity
-hash, the audit trail) versus merely asserted.
+**There is still no per-human login.** A first pass at this section said
+every endpoint was open — that was true, and it was the single biggest
+hole a reviewer would find. It's closed at the layer that matters: every
+mutating endpoint (`POST /consent`, `POST /consent/{id}/revoke`,
+`POST /transaction/execute`) now requires a signed `(X-Principal-Id,
+X-AgentGate-Key)` header pair (`app/auth.py`), the key is
+`HMAC(AGENTGATE_HMAC_SECRET, principal_id)` — the same secret and pattern
+already used for the consent integrity hash — and the API enforces that
+the calling principal actually owns the consent it's acting on. A caller
+without the secret can no longer create, spend against, or revoke *any*
+consent; "any caller can revoke someone else's consent" is no longer true
+of the raw API. What's still missing is real user login: the dashboard has
+no session system, so it is one trusted client holding the shared secret
+and asserting a principal on a human's behalf (`frontend/lib/serverAuth.ts`
++ the `app/api/agentgate/*` proxy routes, which is also why the secret
+never reaches the browser). Putting a real authenticated session in front
+of the dashboard — so the *human*, not the dashboard process, is the
+credentialed principal — is the honest remaining gap, and it's a login
+integration, not a consent-engine redesign: `require_principal` in
+`app/auth.py` is exactly the seam it plugs into.
 
 Also out of scope, with reasons, in [Future Work](#10-future-work):
 multi-merchant catalogs, negotiation, velocity limiting, circuit breakers.
@@ -193,6 +265,14 @@ The rubric asks for this directly. The non-trivial ones:
 
 ## 4. API contract
 
+Every mutating endpoint below (`POST /consent`, `POST /consent/{id}/revoke`,
+`POST /transaction/execute`) requires two headers: `X-Principal-Id: <user_id>`
+and `X-AgentGate-Key: <hex HMAC-SHA256(AGENTGATE_HMAC_SECRET, user_id)>`
+(`app/auth.py`). A missing/invalid key is `401`; a valid key for a principal
+that doesn't own the consent being acted on is `403`. Read-only endpoints
+(`GET /consent/{id}`, `GET /catalog`, `GET /audit/{id}`, …) are unauthenticated,
+same as before.
+
 ### Consent
 
 `POST /consent` — create a contract.
@@ -203,11 +283,13 @@ The rubric asks for this directly. The non-trivial ones:
 ```
 → `201`, full contract including `integrity_hash` and a freshly-recomputed
 `integrity_valid` flag (never trusted from storage — recomputed on every
-read).
+read). The `X-Principal-Id` header must equal `user_id` in the body — a
+principal can only create a consent for itself.
 
 `GET /consent/{id}` — same shape, plus `revoked_at`.
 
 `POST /consent/{id}/revoke` → `{"consent_id": "...", "status": "revoked", "revoked_at": "..."}`.
+The authenticated principal must be the consent's `user_id`.
 
 ### Catalog
 
@@ -229,7 +311,7 @@ Pass a `sku` and the price + category come from the catalog; any `amount`
 in the body is ignored. For a non-catalog purchase, pass `amount` +
 `sku_category` instead (still supported — the race and revocation demo
 scripts use it). `simulate_delay_ms` is capped at 5000 and only honored
-under `DEMO_MODE`.
+under `DEMO_MODE`. The authenticated principal must own `consent_id`.
 
 Sequence: catalog price resolution → abandoned-reservation sweep →
 idempotency lookup → `check_consent` → `SELECT ... FOR UPDATE` row lock →
@@ -480,7 +562,12 @@ npm run dev
 
 You'll need `NEXT_PUBLIC_RAZORPAY_KEY_ID` in `frontend/.env.local` for
 local Next.js dev. If you run through Docker Compose, the web image gets
-that public key from the root `.env` at build time.
+that public key from the root `.env` at build time. You'll also need
+`AGENTGATE_HMAC_SECRET` in `frontend/.env.local`, matching the backend's
+value exactly — the dashboard's own `app/api/agentgate/*` routes use it to
+sign create/spend/revoke calls server-side (see §1 and §4). Docker Compose
+already wires this up: `web` gets `AGENTGATE_HMAC_SECRET` from the root
+`.env` and `INTERNAL_API_URL` from `docker-compose.yml` automatically.
 
 For pure webhook testing, Razorpay's servers must be able to reach
 `/webhooks/razorpay` (e.g. `ngrok` during local dev), and that URL plus
@@ -501,9 +588,9 @@ pip install -r requirements.txt --break-system-packages
 python -m pytest tests/ -v
 ```
 
-56 tests across `test_audit.py`, `test_executor.py`, `test_webhooks.py`,
+67 tests across `test_audit.py`, `test_executor.py`, `test_webhooks.py`,
 `test_failure_path.py`, `test_revocation.py`, `test_agent.py`,
-`test_catalog.py`, and `test_demo_mode.py`. The `mock_razorpay` fixture in
+`test_catalog.py`, `test_demo_mode.py`, and `test_auth.py`. The `mock_razorpay` fixture in
 `tests/conftest.py` patches exactly the network boundary
 (`app.executor.get_client` / `app.executor.create_order`) — row locking,
 audit logging, idempotency, reservation holds, and webhook signature
@@ -511,12 +598,18 @@ verification all run for real, unmocked.
 
 ### Happy path
 ```bash
-curl -X POST localhost:8000/consent -H 'content-type: application/json' -d '{
+# every mutating call needs a signed principal header pair (§4) — compute
+# it once for this shell:
+KEY=$(python3 -c "import hmac,hashlib,os; print(hmac.new(os.environ.get('AGENTGATE_HMAC_SECRET','dev-only-change-me').encode(), b'u_1', hashlib.sha256).hexdigest())")
+
+curl -X POST localhost:8000/consent \
+  -H 'content-type: application/json' -H 'X-Principal-Id: u_1' -H "X-AgentGate-Key: $KEY" -d '{
   "user_id": "u_1", "merchant_id": "m_groceries_01",
   "spend_limit": 2000, "per_txn_max": 500,
   "scope": ["groceries"], "expiry_days": 7}'
 # take the returned consent_id, then buy a catalog item by SKU:
-curl -X POST localhost:8000/transaction/execute -H 'content-type: application/json' -d '{
+curl -X POST localhost:8000/transaction/execute \
+  -H 'content-type: application/json' -H 'X-Principal-Id: u_1' -H "X-AgentGate-Key: $KEY" -d '{
   "consent_id": "<id>", "sku": "sku_rice_5kg", "idempotency_key": "demo-1"}'
 # → status "pending", amount 420.00 (from the catalog, not the request)
 ```
@@ -608,8 +701,10 @@ things above:
 - **A real NPCI UAP / MCP transport implementation** — see the protocol
   narrative above; the data model is shaped to make this a mapping
   exercise later, not attempted here.
-- **Authentication / authorization** — deliberately none; this is the
-  system's biggest hole and it is called out up front, in
+- **Real human login in front of the dashboard** — per-principal
+  request signing is now enforced at the API (`app/auth.py`); a real
+  session/login system authenticating the human behind that principal is
+  what's left, called out in
   [What this deliberately does not do](#what-this-deliberately-does-not-do).
 
 ---

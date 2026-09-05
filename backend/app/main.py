@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app import catalog as catalog_svc
 from app import consent as consent_svc
 from app import audit as audit_svc
+from app.auth import require_principal
 from app.db import get_db, init_db
 from app.config import get_settings
 from app.executor import TransactionExecutor
@@ -15,6 +16,7 @@ from app.executor import get_transaction_status as get_transaction_status_svc
 from app.executor import release_stale_reservations
 from app.failure import FailureHandler
 from app.models import ActionType
+from app.models import ConsentContract
 from app.models import Transaction
 from app.razorpay_client import get_client, verify_payment_signature
 from app.webhooks import router as webhooks_router
@@ -84,15 +86,19 @@ def _to_consent_response(contract) -> ConsentResponse:
 
 
 @app.post("/consent", response_model=ConsentResponse, status_code=201)
-def create_consent(req: ConsentCreateRequest, db: Session = Depends(get_db)):
+def create_consent(
+    req: ConsentCreateRequest,
+    db: Session = Depends(get_db),
+    principal: str = Depends(require_principal),
+):
+    if principal != req.user_id:
+        raise HTTPException(status_code=403, detail="cannot create a consent for another principal")
     contract = consent_svc.create_consent(db, req)
     return _to_consent_response(contract)
 
 
 @app.get("/consent/{consent_id}", response_model=ConsentResponse)
 def get_consent(consent_id: str, db: Session = Depends(get_db)):
-    from app.models import ConsentContract
-
     # Return any budget held by abandoned checkouts before rendering, so the
     # dashboard never shows a stale `spend_reserved` (Task 2).
     release_stale_reservations(db, consent_id)
@@ -104,7 +110,17 @@ def get_consent(consent_id: str, db: Session = Depends(get_db)):
 
 
 @app.post("/consent/{consent_id}/revoke", response_model=ConsentRevokeResponse)
-def revoke_consent(consent_id: str, db: Session = Depends(get_db)):
+def revoke_consent(
+    consent_id: str,
+    db: Session = Depends(get_db),
+    principal: str = Depends(require_principal),
+):
+    existing = db.get(ConsentContract, consent_id)
+    if existing is None:
+        raise HTTPException(status_code=404, detail="consent not found")
+    if existing.user_id != principal:
+        raise HTTPException(status_code=403, detail="not the owning principal for this consent")
+
     contract = consent_svc.revoke_consent(db, consent_id)
     if contract is None:
         raise HTTPException(status_code=404, detail="consent not found")
@@ -121,7 +137,17 @@ def revoke_consent(consent_id: str, db: Session = Depends(get_db)):
 
 
 @app.post("/transaction/execute", response_model=ExecuteTransactionResponse)
-def execute_transaction(req: ExecuteTransactionRequest, db: Session = Depends(get_db)):
+def execute_transaction(
+    req: ExecuteTransactionRequest,
+    db: Session = Depends(get_db),
+    principal: str = Depends(require_principal),
+):
+    contract = db.get(ConsentContract, req.consent_id)
+    if contract is None:
+        raise HTTPException(status_code=404, detail="consent not found")
+    if contract.user_id != principal:
+        raise HTTPException(status_code=403, detail="not the owning principal for this consent")
+
     executor = TransactionExecutor(db)
     return executor.execute(
         consent_id=req.consent_id,

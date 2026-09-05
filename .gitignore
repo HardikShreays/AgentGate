@@ -14,3 +14,8 @@ FIX_PLAN.md
 venv/
 .venv/
 .DS_Store
+
+# Pitch deck — large binary, not part of the code submission. ~$* is the
+# Office lock file created while the deck is open.
+*.pptx
+~$*

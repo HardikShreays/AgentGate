@@ -31,24 +31,39 @@ Sequence:
      race_condition_detected row appears in the audit trail.
 """
 import argparse
+import hashlib
+import hmac
+import os
 import sys
 import threading
 import uuid
 
 import httpx
 
+USER_ID = "u_race_demo"
+
+
+def _principal_headers(user_id: str) -> dict:
+    # Mirrors app.auth.derive_principal_key exactly. Not imported directly
+    # because this script is invoked as a bare file (README §9), not as
+    # part of the `app` package, so `app` isn't necessarily importable.
+    secret = os.environ.get("AGENTGATE_HMAC_SECRET", "dev-only-change-me")
+    key = hmac.new(secret.encode("utf-8"), user_id.encode("utf-8"), hashlib.sha256).hexdigest()
+    return {"X-Principal-Id": user_id, "X-AgentGate-Key": key}
+
 
 def create_consent(client: httpx.Client, base_url: str, spend_limit: float, per_txn_max: float) -> dict:
     resp = client.post(
         f"{base_url}/consent",
         json={
-            "user_id": "u_race_demo",
+            "user_id": USER_ID,
             "merchant_id": "m_groceries_01",
             "spend_limit": spend_limit,
             "per_txn_max": per_txn_max,
             "scope": ["groceries"],
             "expiry_days": 7,
         },
+        headers=_principal_headers(USER_ID),
     )
     resp.raise_for_status()
     return resp.json()
@@ -79,6 +94,7 @@ def run_once(base_url: str, amount: float, run_number: int) -> bool:
                         "idempotency_key": str(uuid.uuid4()),
                         "simulate_delay_ms": 0,
                     },
+                    headers=_principal_headers(USER_ID),
                 )
                 results[idx] = resp.json()
             except Exception as exc:

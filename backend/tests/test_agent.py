@@ -25,6 +25,7 @@ from langchain_core.messages import AIMessage, ToolMessage
 from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
 
 from app import audit as audit_svc
+from app import consent as consent_svc
 from app.agent import MAX_ITERATIONS, build_agent, build_tools, run_agent
 from app.models import ActionType
 
@@ -105,6 +106,67 @@ def test_execute_transaction_tool_creates_real_order_when_allowed(db, consent_co
     assert result["status"] == "pending"
     assert result["razorpay_order_id"] is not None
     assert result["transaction_id"] is not None
+
+
+def test_check_consent_tool_denies_after_revocation(db, consent_contract):
+    """The council's open question: does the agent itself respect a
+    revocation, or only the HTTP/executor layer? check_consent_tool calls
+    straight into app.consent.check_consent (the same function
+    POST /transaction/execute uses under its row lock) — there is no
+    separate, weaker consent check for the agent path. Revoking here and
+    then calling the tool directly (no HTTP, no executor) proves the
+    agent's own tool call is blocked, not just Razorpay's."""
+    consent_svc.revoke_consent(db, consent_contract.consent_id)
+    _browse, check_consent_tool, _execute, _status = build_tools(db, "test-run", {})
+
+    result = check_consent_tool.invoke(
+        {"consent_id": consent_contract.consent_id, "amount": 100.0, "sku_category": "groceries"}
+    )
+
+    assert result["allowed"] is False
+    assert result["reason"] == "revoked_mid_transaction"
+
+
+def test_execute_transaction_tool_denies_after_revocation_no_razorpay_order(db, consent_contract, mock_razorpay):
+    consent_svc.revoke_consent(db, consent_contract.consent_id)
+    _browse, _check, execute_transaction_tool, _status = build_tools(db, "test-run", {})
+
+    result = execute_transaction_tool.invoke(
+        {"consent_id": consent_contract.consent_id, "amount": 100.0, "sku_category": "groceries"}
+    )
+
+    assert result["status"] == "denied"
+    assert result["reason"] == "revoked_mid_transaction"
+    assert result["transaction_id"] is None
+
+    trail = audit_svc.get_audit_trail(db, consent_contract.consent_id)
+    assert all(e.action_type != ActionType.order_created for e in trail.entries)
+
+
+def test_agent_graph_reports_denial_when_consent_revoked_before_run(db, consent_contract):
+    """End-to-end through the graph (not just the bare tool): the model
+    tries check -> execute exactly as it would for a healthy consent, and
+    the agent's final summary reflects the tool's denial rather than a
+    hallucinated success — because the tools, not the model, decided."""
+    consent_svc.revoke_consent(db, consent_contract.consent_id)
+    fake_model = _FakeToolCallingModel(
+        responses=[
+            _tool_call_message(
+                "check_consent_tool",
+                {"consent_id": consent_contract.consent_id, "amount": 450.0, "sku_category": "groceries"},
+                "call_1",
+            ),
+            AIMessage(content="That purchase is denied: the consent has been revoked."),
+        ]
+    )
+
+    result = run_agent(db, "Order ₹450 of groceries", model=fake_model)
+
+    assert "revoked" in result["final_response"].lower()
+    assert result["execute_result"] is None
+
+    trail = audit_svc.get_audit_trail(db, consent_contract.consent_id)
+    assert all(e.action_type != ActionType.order_created for e in trail.entries)
 
 
 def test_get_status_tool_returns_error_dict_for_unknown_transaction(db):

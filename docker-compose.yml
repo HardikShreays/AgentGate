@@ -24,5 +24,15 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    environment:
+      # This container's own server-side fetches (app/api/agentgate/*
+      # route handlers) go through the internal Docker network, not the
+      # host-exposed port NEXT_PUBLIC_API_URL points at.
+      INTERNAL_API_URL: http://api:8000
+    env_file:
+      # Only AGENTGATE_HMAC_SECRET is actually used from here (to sign
+      # requests on the backend's behalf — see lib/serverAuth.ts); the
+      # rest of the root .env is harmless unused noise in this container.
+      - .env
     depends_on:
       - api

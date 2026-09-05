@@ -17,10 +17,13 @@ import {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+// `base` defaults to the backend (API_URL). Pass "" for the three mutating
+// endpoints so the fetch stays same-origin, hitting this Next.js app's own
+// /api/agentgate/* route handler instead of the backend directly.
+async function request<T>(path: string, init?: RequestInit, base: string = API_URL): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(`${API_URL}${path}`, {
+    res = await fetch(`${base}${path}`, {
       ...init,
       headers: { "Content-Type": "application/json", ...(init?.headers || {}) },
       cache: "no-store",
@@ -46,8 +49,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+// create/revoke/execute are the mutating endpoints the backend now requires
+// a signed principal for (see backend/app/auth.py). The signing secret must
+// never reach the browser, so these three go through this app's own
+// /api/agentgate/* route handlers (server-side, holds the secret) instead
+// of straight to the backend like every read-only call below.
 export function createConsent(body: ConsentCreateRequest): Promise<ConsentResponse> {
-  return request(`/consent`, { method: "POST", body: JSON.stringify(body) });
+  return request(`/api/agentgate/consent`, { method: "POST", body: JSON.stringify(body) }, "");
 }
 
 export function getConsent(consentId: string): Promise<ConsentResponse> {
@@ -55,9 +63,9 @@ export function getConsent(consentId: string): Promise<ConsentResponse> {
 }
 
 export function revokeConsent(consentId: string): Promise<ConsentRevokeResponse> {
-  return request(`/consent/${encodeURIComponent(consentId)}/revoke`, {
+  return request(`/api/agentgate/consent/${encodeURIComponent(consentId)}/revoke`, {
     method: "POST",
-  });
+  }, "");
 }
 
 export function getAuditTrail(consentId: string): Promise<AuditTrailResponse> {
@@ -67,7 +75,7 @@ export function getAuditTrail(consentId: string): Promise<AuditTrailResponse> {
 export function executeTransaction(
   body: ExecuteTransactionRequest
 ): Promise<ExecuteTransactionResponse> {
-  return request(`/transaction/execute`, { method: "POST", body: JSON.stringify(body) });
+  return request(`/api/agentgate/transaction/execute`, { method: "POST", body: JSON.stringify(body) }, "");
 }
 
 export function getCatalog(category?: string): Promise<CatalogResponse> {
