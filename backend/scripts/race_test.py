@@ -39,6 +39,15 @@ import threading
 import uuid
 
 import httpx
+from dotenv import load_dotenv
+
+# Same file the running API reads its secret from (app/config.py's
+# `env_file=".env"` is relative to backend/, not to wherever this script
+# is invoked from) — loaded explicitly here since a plain os.environ.get()
+# only sees vars actually exported into the shell, not ones sitting in a
+# .env file. Without this, the script would silently sign with the wrong
+# key and every request below would 401.
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 USER_ID = "u_race_demo"
 
